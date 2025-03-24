@@ -28,8 +28,8 @@ public final class GameServer {
     * @param entitiesFile The game configuration file containing all game entities to use in your game
     * @param actionsFile The game configuration file containing all game actions to use in your game
     */
+    // TODO implement server logic here
     public GameServer(File entitiesFile, File actionsFile) {
-        // TODO implement your server logic here
 
     }
 
@@ -39,8 +39,8 @@ public final class GameServer {
     *
     * @param command The incoming command to be processed
     */
+    // TODO implement your server logic here
     public String handleCommand(String command) {
-        // TODO implement your server logic here
         return "";
     }
 
