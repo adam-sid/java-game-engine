@@ -15,7 +15,7 @@ public class Location extends GameEntity {
         return this.paths;
     }
 
-    public void addPath(String locationName, Location location) {
+    public void addPath(Location location) {
         this.paths.add(location);
     }
 }

@@ -2,16 +2,14 @@ package edu.uob;
 
 import edu.uob.GameEntity.GameEntity;
 import edu.uob.GameEntity.Location;
-
-import java.util.HashMap;
 import java.util.HashSet;
 
 public class GameState {
 
-    private final HashSet<Location> locations;
-    private final HashSet<GameEntity> furniture;
-    private HashSet<GameEntity> artefacts;
-    private HashSet<GameEntity> characters;
+    public final HashSet<Location> locations;
+    public final HashSet<GameEntity> furniture;
+    public HashSet<GameEntity> artefacts;
+    public HashSet<GameEntity> characters;
 
     public GameState(HashSet<Location> locations, HashSet<GameEntity> furniture,
                      HashSet<GameEntity> artefacts, HashSet<GameEntity> characters ) {
@@ -19,6 +17,36 @@ public class GameState {
         this.furniture = furniture;
         this.artefacts = artefacts;
         this.characters = characters;
+    }
+
+    public HashSet<GameEntity> getEntitiesFromLocation(String entityType, String locationName) {
+        HashSet<GameEntity> filteredEntities = new HashSet<>();
+        switch (entityType) {
+            case "furniture":
+                for (GameEntity gameEntity : furniture) {
+                    if (gameEntity.getLocationName().equals(locationName)) {
+                        filteredEntities.add(gameEntity);
+                    }
+                }
+                break;
+            case "character":
+                for (GameEntity gameEntity : characters) {
+                    if (gameEntity.getLocationName().equals(locationName)) {
+                        filteredEntities.add(gameEntity);
+                    }
+                }
+                break;
+            case "artefact":
+                for (GameEntity gameEntity : artefacts) {
+                    if (gameEntity.getLocationName().equals(locationName)) {
+                        filteredEntities.add(gameEntity);
+                    }
+                }
+                break;
+            default:
+                throw new IllegalArgumentException();
+        }
+        return filteredEntities;
     }
 
     public void changeLocation(GameEntity entity, String locationName, Boolean isArtefact) {
@@ -34,7 +62,7 @@ public class GameState {
         }
     }
 
-
-
-
+    public void addPath(Location from, Location to) {
+        locations.add(from);
+    };
 }
