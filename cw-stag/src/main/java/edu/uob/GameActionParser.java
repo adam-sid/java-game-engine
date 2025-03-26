@@ -10,6 +10,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 
+import edu.uob.Entity.Entity;
 import edu.uob.GameAction.GameAction;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
@@ -19,20 +20,11 @@ import org.w3c.dom.NodeList;
 
 public class GameActionParser {
 
-    private final String fileName;
-    private final Map<String, Set<GameAction>> actions;
-
-    public GameActionParser(String filePath) {
-        this.fileName = filePath;
-        this.actions = parseActionFile(this.fileName);
-    }
-
-
-    public Map<String, Set<GameAction>> parseActionFile(String fileName) {
+    public static void parseActionFile(String fileName, GameState gameState) {
         try {
             String filePath = new StringBuilder("config")
                     .append(File.separator)
-                    .append(this.fileName)
+                    .append(fileName)
                     .toString();
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             Document document = builder.parse(filePath);
@@ -45,7 +37,7 @@ public class GameActionParser {
                 Set<String> subjects = new HashSet<>();
                 Set<String> produced = new HashSet<>();
                 Set<String> consumed = new HashSet<>();
-                String narration;
+                String narration = null;
                 for (int actionChildrenIndex = 0; actionChildrenIndex < actionChildren.getLength(); actionChildrenIndex++) {
                     Node actionChild = actionChildren.item(actionChildrenIndex);
                     String type = actionChild.getNodeName();
@@ -67,20 +59,35 @@ public class GameActionParser {
                             break;
                         }
                         case "narration": {
-                            narration = actionChild.getNodeValue();
+                            narration = actionChild.getTextContent();
                             break;
                         }
                         default:
                             break;
                     }
                 }
-                System.out.println("Hello");
+                Map<String, Entity> subjectEntities = lookUpEntities(gameState, subjects);
+                Map<String, Entity> producedEntities = lookUpEntities(gameState, produced);
+                Map<String, Entity> consumedEntities = lookUpEntities(gameState, consumed);
+                GameAction gameAction = new GameAction(subjectEntities, consumedEntities, producedEntities, narration);
+                System.out.println(gameAction);
             }
-            // Get the first trigger phrase
+
         } catch (ParserConfigurationException | IOException | SAXException e) {
             throw new RuntimeException(e);
         }
-        return null;
+    }
+
+    private static Map<String, Entity> lookUpEntities(GameState gameState, Set<String> subjects) {
+        Map<String, Entity> entities = new HashMap<>();
+        for (String entityName : subjects) {
+            Entity subjectEntity = gameState.getAllEntities().get(entityName);
+            if (subjectEntity == null) {
+                throw new RuntimeException(entityName);
+            }
+            entities.put(entityName, subjectEntity);
+        }
+        return entities;
     }
 
     private static Set<String> extractLeafContent(Node actionChild) {

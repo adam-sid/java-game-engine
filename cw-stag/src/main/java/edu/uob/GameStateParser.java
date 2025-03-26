@@ -18,18 +18,18 @@ import edu.uob.Entity.LocationEntity;
 public class GameStateParser {
 
     private final String fileName;
-    private final HashSet<LocationEntity> locations;
-    private final HashSet<Entity> furniture;
-    private final HashSet<Entity> artefacts;
-    private final HashSet<Entity> characters;
+    private final Map<String, Entity> locations;
+    private final Map<String, Entity> furniture;
+    private final Map<String, Entity> artefacts;
+    private final Map<String, Entity> characters;
     private final GameState gameState;
 
     public GameStateParser(String fileName) {
         this.fileName = fileName;
-        this.locations = new HashSet<>();
-        this.furniture = new HashSet<>();
-        this.artefacts = new HashSet<>();
-        this.characters = new HashSet<>();
+        this.locations = new HashMap<String, Entity>();
+        this.furniture = new HashMap<String, Entity>();
+        this.artefacts = new HashMap<String, Entity>();
+        this.characters = new HashMap<String, Entity>();
         this.parseEntityFile();
         this.gameState = new GameState(this.locations, this.furniture, this.artefacts, this.characters);
     }
@@ -61,7 +61,7 @@ public class GameStateParser {
             Node locationDetails = location.getNodes(false).get(0);
             String locationName = locationDetails.getId().getId().toLowerCase();
             String locationDescription = locationDetails.getAttribute("description").toLowerCase();
-            this.locations.add(new LocationEntity(locationName, locationDescription, locationName));
+            this.locations.put(locationName, new LocationEntity(locationName, locationDescription, locationName));
             List<Graph> features = location.getSubgraphs();
             this.parseEntities(features, locationName);
         }
@@ -76,13 +76,13 @@ public class GameStateParser {
                 String entityDescription = entity.getAttribute("description").toLowerCase();
                 switch (featureName) {
                     case "furniture":
-                        this.furniture.add(new Entity(entityName, entityDescription, locationName));
+                        this.furniture.put(entityName, new Entity(entityName, entityDescription, locationName));
                         break;
                     case "characters":
-                        this.characters.add(new Entity(entityName, entityDescription, locationName));
+                        this.characters.put(entityName, new Entity(entityName, entityDescription, locationName));
                         break;
                     case "artefacts":
-                        this.artefacts.add(new Entity(entityName, entityDescription, locationName));
+                        this.artefacts.put(entityName, new Entity(entityName, entityDescription, locationName));
                         break;
                     default:
                         throw new RuntimeException();
@@ -92,18 +92,14 @@ public class GameStateParser {
     }
 
     public void parsePaths(List<Edge> paths){
-        Map<String, LocationEntity> locationMap = new HashMap<>();
-        for (LocationEntity location : this.locations) {
-            locationMap.put(location.getName(), location);
-        }
         for (Edge path : paths) {
             Node fromLocation = path.getSource().getNode();
             Node toLocation = path.getTarget().getNode();
             String fromName = fromLocation.getId().getId().toLowerCase();
             String toName = toLocation.getId().getId().toLowerCase();
 
-            LocationEntity fromLocationObj = locationMap.get(fromName);
-            LocationEntity toLocationObj = locationMap.get(toName);
+            LocationEntity fromLocationObj = (LocationEntity) locations.get(fromName);
+            LocationEntity toLocationObj = (LocationEntity) locations.get(toName);
 
             if (fromLocationObj != null && toLocationObj != null) {
                 fromLocationObj.addPath(toLocationObj);

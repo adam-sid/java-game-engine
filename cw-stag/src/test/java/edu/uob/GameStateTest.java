@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -16,13 +17,13 @@ public class GameStateTest {
     void testEntitiesAddedToGameState() {
         GameStateParser parser = new GameStateParser("basic-entities.dot");
         GameState gameState = parser.getGameState();
-        HashSet<LocationEntity> locations = gameState.locations;
+        Map<String, Entity> locations = gameState.getLocations();
         assertEquals(4, locations.size());
-        HashSet<Entity> furniture = gameState.furniture;
+        Map<String, Entity> furniture = gameState.getFurniture();
         assertEquals(2, furniture.size());
-        HashSet<Entity> characters = gameState.characters;
+        Map<String, Entity> characters = gameState.getCharacters();
         assertEquals(1, characters.size());
-        HashSet<Entity> artefacts = gameState.artefacts;
+        Map<String, Entity> artefacts = gameState.getArtefacts();
         assertEquals(4, artefacts.size());
     }
 
@@ -30,9 +31,9 @@ public class GameStateTest {
     void testFurnitureHasLocation() {
         GameStateParser parser = new GameStateParser("basic-entities.dot");
         GameState gameState = parser.getGameState();
-        HashSet<Entity> forestFurniture = gameState.getEntitiesFromLocation(
+        Map<String, Entity> forestFurniture = gameState.getEntitiesFromLocation(
                 "furniture", "forest");
-        Entity tree = forestFurniture.stream().findFirst().get();
+        Entity tree = forestFurniture.values().stream().findFirst().get();
         assertEquals(1, forestFurniture.size());
         assertEquals("tree", tree.getName());
 
@@ -44,6 +45,7 @@ public class GameStateTest {
         GameState gameState = parser.getGameState();
         LocationEntity forest = (LocationEntity) gameState
                 .getEntitiesFromLocation("location", "forest")
+                .values()
                 .stream()
                 .findFirst()
                 .get();
