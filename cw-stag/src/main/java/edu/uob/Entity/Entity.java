@@ -1,14 +1,13 @@
-package edu.uob.GameEntity;
+package edu.uob.Entity;
 
-import java.util.HashMap;
 // TODO this was previously abstract - changed so I could directly instantiate game entities
-public class GameEntity
+public class Entity
 {
-    private String name;
-    private String description;
+    private final String name;
+    private final String description;
     private String locationName;
 
-    public GameEntity(String name, String description, String locationName)
+    public Entity(String name, String description, String locationName)
     {
         this.name = name;
         this.description = description;
