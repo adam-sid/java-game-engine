@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
@@ -18,7 +20,7 @@ import org.w3c.dom.NodeList;
 public class GameActionParser {
 
     private final String fileName;
-    private final HashMap<String, HashSet<GameAction>> actions;
+    private final Map<String, Set<GameAction>> actions;
 
     public GameActionParser(String filePath) {
         this.fileName = filePath;
@@ -26,7 +28,7 @@ public class GameActionParser {
     }
 
 
-    public HashMap<String, HashSet<GameAction>> parseActionFile(String fileName) {
+    public Map<String, Set<GameAction>> parseActionFile(String fileName) {
         try {
             String filePath = new StringBuilder("config")
                     .append(File.separator)
@@ -39,69 +41,60 @@ public class GameActionParser {
             for (int actionIndex = 1; actionIndex < actions.getLength(); actionIndex+=2) {
                 Element action = (Element) actions.item(actionIndex);
                 NodeList actionChildren = action.getChildNodes();
+                Set<String> triggers = new HashSet<>();
+                Set<String> subjects = new HashSet<>();
+                Set<String> produced = new HashSet<>();
+                Set<String> consumed = new HashSet<>();
+                String narration;
                 for (int actionChildrenIndex = 0; actionChildrenIndex < actionChildren.getLength(); actionChildrenIndex++) {
                     Node actionChild = actionChildren.item(actionChildrenIndex);
                     String type = actionChild.getNodeName();
                     switch (type) {
                         case "triggers": {
-                            NodeList triggerChildren = actionChild.getChildNodes();
-                            for (int i = 0; i < triggerChildren.getLength(); i++) {
-                                if (triggerChildren.item(i).getNodeType() == Node.ELEMENT_NODE) {
-                                    Element keyphraseNode = (Element) triggerChildren.item(i);
-                                    String keyphrase = keyphraseNode.getTextContent();
-                                    System.out.println(keyphrase);
-                                }
-                            }
+                            triggers.addAll(extractLeafContent(actionChild));
                             break;
                         }
                         case "subjects": {
-                            NodeList triggerChildren = actionChild.getChildNodes();
-                            for (int i = 0; i < triggerChildren.getLength(); i++) {
-                                if (triggerChildren.item(i).getNodeType() == Node.ELEMENT_NODE) {
-                                    Element keyphraseNode = (Element) triggerChildren.item(i);
-                                    String keyphrase = keyphraseNode.getTextContent();
-                                    System.out.println(keyphrase);
-                                }
-                            }
-
+                            subjects.addAll(extractLeafContent(actionChild));
                             break;
                         }
                         case "produced": {
-                            NodeList triggerChildren = actionChild.getChildNodes();
-                            for (int i = 0; i < triggerChildren.getLength(); i++) {
-                                if (triggerChildren.item(i).getNodeType() == Node.ELEMENT_NODE) {
-                                    Element keyphraseNode = (Element) triggerChildren.item(i);
-                                    String keyphrase = keyphraseNode.getTextContent();
-                                    System.out.println(keyphrase);
-                                }
-                            }
+                            produced.addAll(extractLeafContent(actionChild));
                             break;
                         }
                         case "consumed": {
-                            NodeList triggerChildren = actionChild.getChildNodes();
-                            for (int i = 0; i < triggerChildren.getLength(); i++) {
-                                if (triggerChildren.item(i).getNodeType() == Node.ELEMENT_NODE) {
-                                    Element keyphraseNode = (Element) triggerChildren.item(i);
-                                    String keyphrase = keyphraseNode.getTextContent();
-                                    System.out.println(keyphrase);
-                                }
-                            }
+                            consumed.addAll(extractLeafContent(actionChild));
                             break;
                         }
-                        case "narration":
-
+                        case "narration": {
+                            narration = actionChild.getNodeValue();
                             break;
+                        }
                         default:
                             break;
                     }
                 }
-
+                System.out.println("Hello");
             }
             // Get the first trigger phrase
         } catch (ParserConfigurationException | IOException | SAXException e) {
             throw new RuntimeException(e);
         }
         return null;
+    }
+
+    private static Set<String> extractLeafContent(Node actionChild) {
+        NodeList triggerChildren = actionChild.getChildNodes();
+        Set<String> leafContents = new HashSet<>();
+        for (int i = 0; i < triggerChildren.getLength(); i++) {
+            if (triggerChildren.item(i).getNodeType() == Node.ELEMENT_NODE) {
+                Element node = (Element) triggerChildren.item(i);
+                String content = node.getTextContent();
+                System.out.println(content);
+                leafContents.add(content);
+            }
+        }
+        return leafContents;
     }
 
 //    public HashMap<String, HashSet<GameAction>> parseActionFile(String fileName) {
