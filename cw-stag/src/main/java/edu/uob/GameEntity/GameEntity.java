@@ -1,13 +1,13 @@
-package edu.uob.Entity;
+package edu.uob.GameEntity;
 
 // TODO this was previously abstract - changed so I could directly instantiate game entities
-public class Entity
+public class GameEntity
 {
     private final String name;
     private final String description;
     private String locationName;
 
-    public Entity(String name, String description, String locationName)
+    public GameEntity(String name, String description, String locationName)
     {
         this.name = name;
         this.description = description;

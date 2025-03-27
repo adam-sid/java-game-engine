@@ -10,7 +10,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 
-import edu.uob.Entity.Entity;
+import edu.uob.GameEntity.GameEntity;
 import edu.uob.GameAction.GameAction;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
@@ -20,6 +20,7 @@ import org.w3c.dom.NodeList;
 
 public class GameActionParser {
 
+    //main method - calls all helpers and ensures file can be found in config
     public static void parseActionFile(String fileName, GameState gameState) {
         try {
             String filePath = new StringBuilder("config")
@@ -30,58 +31,65 @@ public class GameActionParser {
             Document document = builder.parse(filePath);
             Element root = document.getDocumentElement();
             NodeList actions = root.getChildNodes();
-            for (int actionIndex = 1; actionIndex < actions.getLength(); actionIndex+=2) {
-                Element action = (Element) actions.item(actionIndex);
-                NodeList actionChildren = action.getChildNodes();
-                Set<String> triggers = new HashSet<>();
-                Set<String> subjects = new HashSet<>();
-                Set<String> produced = new HashSet<>();
-                Set<String> consumed = new HashSet<>();
-                String narration = null;
-                for (int actionChildrenIndex = 0; actionChildrenIndex < actionChildren.getLength(); actionChildrenIndex++) {
-                    Node actionChild = actionChildren.item(actionChildrenIndex);
-                    String type = actionChild.getNodeName();
-                    switch (type) {
-                        case "triggers": {
-                            triggers.addAll(extractLeafContent(actionChild));
-                            break;
-                        }
-                        case "subjects": {
-                            subjects.addAll(extractLeafContent(actionChild));
-                            break;
-                        }
-                        case "produced": {
-                            produced.addAll(extractLeafContent(actionChild));
-                            break;
-                        }
-                        case "consumed": {
-                            consumed.addAll(extractLeafContent(actionChild));
-                            break;
-                        }
-                        case "narration": {
-                            narration = actionChild.getTextContent();
-                            break;
-                        }
-                        default:
-                            break;
-                    }
-                }
-                Map<String, Entity> subjectEntities = lookUpEntities(gameState, subjects);
-                Map<String, Entity> producedEntities = lookUpEntities(gameState, produced);
-                Map<String, Entity> consumedEntities = lookUpEntities(gameState, consumed);
-                GameAction gameAction = new GameAction(subjectEntities, consumedEntities, producedEntities, narration);
-                System.out.println(gameAction);
-            }
-
+            extractActions(gameState, actions);
         } catch (ParserConfigurationException | IOException | SAXException e) {
             throw new RuntimeException(e);
         }
     }
+    //TODO shorten this method
+    //creates GameAction objects from the XML file and adds to game state
+    private static void extractActions(GameState gameState, NodeList actions) {
+        for (int actionIndex = 1; actionIndex < actions.getLength(); actionIndex+=2) {
+            Element action = (Element) actions.item(actionIndex);
+            NodeList actionChildren = action.getChildNodes();
+            Set<String> triggers = new HashSet<>();
+            Set<String> subjects = new HashSet<>();
+            Set<String> produced = new HashSet<>();
+            Set<String> consumed = new HashSet<>();
+            String narration = null;
+            for (int actionChildrenIndex = 0; actionChildrenIndex < actionChildren.getLength(); actionChildrenIndex++) {
+                Node actionChild = actionChildren.item(actionChildrenIndex);
+                String type = actionChild.getNodeName();
+                switch (type) {
+                    case "triggers": {
+                        triggers.addAll(extractLeafContent(actionChild));
+                        break;
+                    }
+                    case "subjects": {
+                        subjects.addAll(extractLeafContent(actionChild));
+                        break;
+                    }
+                    case "produced": {
+                        produced.addAll(extractLeafContent(actionChild));
+                        break;
+                    }
+                    case "consumed": {
+                        consumed.addAll(extractLeafContent(actionChild));
+                        break;
+                    }
+                    case "narration": {
+                        narration = actionChild.getTextContent();
+                        break;
+                    }
+                    default:
+                        break;
+                }
+            }
+            Map<String, GameEntity> subjectEntities = lookUpEntities(gameState, subjects);
+            Map<String, GameEntity> producedEntities = lookUpEntities(gameState, produced);
+            Map<String, GameEntity> consumedEntities = lookUpEntities(gameState, consumed);
+            GameAction gameAction = new GameAction(subjectEntities, consumedEntities, producedEntities, narration);
+            for (String trigger: triggers) {
+                gameState.setGameAction(trigger, gameAction);
+            }
+        }
+    }
 
-    private static Map<String, Entity> lookUpEntities(GameState gameState, Set<String> subjects) {
-        Map<String, Entity> entities = new HashMap<>();
+    //checks whether entities exist in the game state, if not throws exception as action file is faulty
+    private static Map<String, GameEntity> lookUpEntities(GameState gameState, Set<String> subjects) {
+        Map<String, GameEntity> entities = new HashMap<>();
         for (String entityName : subjects) {
-            Entity subjectEntity = gameState.getAllEntities().get(entityName);
+            GameEntity subjectEntity = gameState.getAllEntities().get(entityName);
             if (subjectEntity == null) {
                 throw new RuntimeException(entityName);
             }
@@ -90,6 +98,7 @@ public class GameActionParser {
         return entities;
     }
 
+    //gets the trigger and entity names from the XML
     private static Set<String> extractLeafContent(Node actionChild) {
         NodeList triggerChildren = actionChild.getChildNodes();
         Set<String> leafContents = new HashSet<>();
@@ -103,34 +112,6 @@ public class GameActionParser {
         }
         return leafContents;
     }
-
-//    public HashMap<String, HashSet<GameAction>> parseActionFile(String fileName) {
-//        try {
-//            String filePath = new StringBuilder("config")
-//                    .append(File.separator)
-//                    .append(this.fileName)
-//                    .toString();
-//            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-//            Document document = builder.parse(filePath);
-//            Element root = document.getDocumentElement();
-//            NodeList actions = root.getChildNodes();
-//            for (int actionIndex = 1; actionIndex < actions.getLength(); actionIndex+=2) {
-//                Element action = (Element) actions.item(actionIndex);
-//                Element triggers = (Element)action.getElementsByTagName("triggers").item(0);
-//                for (int triggerIndex = 0; triggerIndex < triggers.getChildNodes().getLength(); triggerIndex++) {
-//                    Node trigger = triggers.getElementsByTagName("keyphrase").item(triggerIndex);
-//                    String triggerPhrase = trigger.getTextContent();
-//                    System.out.println(triggerPhrase);
-//                }
-//
-//            }
-//            // Get the first trigger phrase
-//        } catch (ParserConfigurationException | IOException | SAXException e) {
-//            throw new RuntimeException(e);
-//        }
-//        return null;
-//    }
-
 
     public HashMap<String, HashSet<GameAction>> getActions() {
         return null;

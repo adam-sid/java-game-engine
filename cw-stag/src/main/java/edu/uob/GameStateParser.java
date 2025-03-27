@@ -3,7 +3,6 @@ package edu.uob;
 import java.io.FileReader;
 import java.io.File;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -11,25 +10,25 @@ import com.alexmerz.graphviz.Parser;
 import com.alexmerz.graphviz.objects.Graph;
 import com.alexmerz.graphviz.objects.Node;
 import com.alexmerz.graphviz.objects.Edge;
-import edu.uob.Entity.Entity;
-import edu.uob.Entity.LocationEntity;
+import edu.uob.GameEntity.GameEntity;
+import edu.uob.GameEntity.LocationGameEntity;
 
 //TODO is it redundant to have gameState and parser hold like information
 public class GameStateParser {
 
     private final String fileName;
-    private final Map<String, Entity> locations;
-    private final Map<String, Entity> furniture;
-    private final Map<String, Entity> artefacts;
-    private final Map<String, Entity> characters;
+    private final Map<String, GameEntity> locations;
+    private final Map<String, GameEntity> furniture;
+    private final Map<String, GameEntity> artefacts;
+    private final Map<String, GameEntity> characters;
     private final GameState gameState;
 
     public GameStateParser(String fileName) {
         this.fileName = fileName;
-        this.locations = new HashMap<String, Entity>();
-        this.furniture = new HashMap<String, Entity>();
-        this.artefacts = new HashMap<String, Entity>();
-        this.characters = new HashMap<String, Entity>();
+        this.locations = new HashMap<String, GameEntity>();
+        this.furniture = new HashMap<String, GameEntity>();
+        this.artefacts = new HashMap<String, GameEntity>();
+        this.characters = new HashMap<String, GameEntity>();
         this.parseEntityFile();
         this.gameState = new GameState(this.locations, this.furniture, this.artefacts, this.characters);
     }
@@ -61,7 +60,7 @@ public class GameStateParser {
             Node locationDetails = location.getNodes(false).get(0);
             String locationName = locationDetails.getId().getId().toLowerCase();
             String locationDescription = locationDetails.getAttribute("description").toLowerCase();
-            this.locations.put(locationName, new LocationEntity(locationName, locationDescription, locationName));
+            this.locations.put(locationName, new LocationGameEntity(locationName, locationDescription, locationName));
             List<Graph> features = location.getSubgraphs();
             this.parseEntities(features, locationName);
         }
@@ -76,13 +75,13 @@ public class GameStateParser {
                 String entityDescription = entity.getAttribute("description").toLowerCase();
                 switch (featureName) {
                     case "furniture":
-                        this.furniture.put(entityName, new Entity(entityName, entityDescription, locationName));
+                        this.furniture.put(entityName, new GameEntity(entityName, entityDescription, locationName));
                         break;
                     case "characters":
-                        this.characters.put(entityName, new Entity(entityName, entityDescription, locationName));
+                        this.characters.put(entityName, new GameEntity(entityName, entityDescription, locationName));
                         break;
                     case "artefacts":
-                        this.artefacts.put(entityName, new Entity(entityName, entityDescription, locationName));
+                        this.artefacts.put(entityName, new GameEntity(entityName, entityDescription, locationName));
                         break;
                     default:
                         throw new RuntimeException();
@@ -98,8 +97,8 @@ public class GameStateParser {
             String fromName = fromLocation.getId().getId().toLowerCase();
             String toName = toLocation.getId().getId().toLowerCase();
 
-            LocationEntity fromLocationObj = (LocationEntity) locations.get(fromName);
-            LocationEntity toLocationObj = (LocationEntity) locations.get(toName);
+            LocationGameEntity fromLocationObj = (LocationGameEntity) locations.get(fromName);
+            LocationGameEntity toLocationObj = (LocationGameEntity) locations.get(toName);
 
             if (fromLocationObj != null && toLocationObj != null) {
                 fromLocationObj.addPath(toLocationObj);

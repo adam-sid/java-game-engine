@@ -1,26 +1,26 @@
 package edu.uob;
 
-import edu.uob.Entity.Entity;
+import edu.uob.GameEntity.GameEntity;
+import edu.uob.GameAction.GameAction;
+import edu.uob.GameEntity.LocationGameEntity;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
-import java.util.function.Consumer;
 
 public class GameState {
     //TODO would using a List to store these be simpler?
-    private final Map<String, Entity> locations;
-    private final Map<String, Entity> furniture;
-    private final Map<String, Entity> artefacts;
-    private final Map<String, Entity> characters;
-    private final Map<String, Entity> allEntities = new HashMap<>();
+    private final Map<String, GameEntity> locations;
+    private final Map<String, GameEntity> furniture;
+    private final Map<String, GameEntity> artefacts;
+    private final Map<String, GameEntity> characters;
+    private final Map<String, GameEntity> allEntities = new HashMap<>();
+    private final Map<String, GameAction> gameActions = new HashMap<>();
 
-    /*TODO add multiplayer function, add execute command method that takes a player as argument and a command (will need
-    parse command, person needs inventory, health and location. Make inventory a hashmap name of entity and entity*/
+    //TODO: add multiplayer function, add execute command method that takes a player as argument and a command (will need
+    //TODO-cont: parse command, person needs inventory, health and location. Make inventory a hashmap name of entity and entity
 
-    public GameState(Map<String, Entity> locations, Map<String, Entity> furniture,
-                     Map<String, Entity> artefacts, Map<String, Entity> characters) {
+    public GameState(Map<String, GameEntity> locations, Map<String, GameEntity> furniture,
+                     Map<String, GameEntity> artefacts, Map<String, GameEntity> characters) {
         this.locations = locations;
         this.furniture = furniture;
         this.artefacts = artefacts;
@@ -30,33 +30,33 @@ public class GameState {
         this.allEntities.putAll(artefacts);
         this.allEntities.putAll(characters);
     }
-
-    public Map<String, Entity> getEntitiesFromLocation(String entityType, String locationName) {
-        Map<String ,Entity> filteredEntities = new HashMap<>();
+    //TODO shorten this method
+    public Map<String, GameEntity> getEntitiesFromLocation(String entityType, String locationName) {
+        Map<String , GameEntity> filteredEntities = new HashMap<>();
         switch (entityType) {
             case "furniture":
-                for (Entity entity : this.furniture.values()) {
+                for (GameEntity entity : this.furniture.values()) {
                     if (entity.getLocationName().equals(locationName)) {
                         filteredEntities.put(entity.getName(), entity);
                     }
                 }
                 break;
             case "character":
-                for (Entity entity : this.characters.values()) {
+                for (GameEntity entity : this.characters.values()) {
                     if (entity.getLocationName().equals(locationName)) {
                         filteredEntities.put(entity.getName(), entity);
                     }
                 }
                 break;
             case "artefact":
-                for (Entity entity : this.artefacts.values()) {
+                for (GameEntity entity : this.artefacts.values()) {
                     if (entity.getLocationName().equals(locationName)) {
                         filteredEntities.put(entity.getName(), entity);
                     }
                 }
                 break;
             case "location":
-                for (Entity entity : this.locations.values()) {
+                for (GameEntity entity : this.locations.values()) {
                     if (entity.getLocationName().equals(locationName)) {
                         filteredEntities.put(entity.getName(), entity);
                     }
@@ -68,52 +68,77 @@ public class GameState {
         return filteredEntities;
     }
 
-//    public void moveEntity(Entity entity, String locationName, String entityType) {
-//        switch (entityType) {
-//            case "furniture":
-//                if (furniture.contains(entity)) {
-//                    furniture.remove(entity);
-//                    entity.setLocationName(locationName);
-//                    furniture.add(entity);
-//                }
-//                break;
-//            case "character":
-//                if (characters.contains(entity)) {
-//                    characters.remove(entity);
-//                    entity.setLocationName(locationName);
-//                    characters.add(entity);
-//                }
-//                break;
-//            case "artefact":
-//                if (artefacts.contains(entity)) {
-//                    artefacts.remove(entity);
-//                    entity.setLocationName(locationName);
-//                    artefacts.add(entity);
-//                }
-//                break;
-//            default:
-//                throw new IllegalArgumentException();
-//        }
-//    }
+    public void setGameAction(String triggerName, GameAction gameAction) {
+        this.gameActions.put(triggerName, gameAction);
+    }
 
-    public Map<String, Entity> getAllEntities() {
+    public Map<String, GameAction> getGameActions() {
+        return gameActions;
+    }
+
+    public void consumeEntity(String entityName) {
+
+    }
+
+    public void produceEntity(String toLocation, String entityName) {
+        if (!allEntities.containsKey(entityName)) {
+            throw new IllegalArgumentException(entityName);
+        }
+        LocationGameEntity currentLocation = (LocationGameEntity) locations.get(entityName);
+        if (locations.containsKey(entityName)) {
+            LocationGameEntity producedPath = (LocationGameEntity) locations.get(entityName);
+            currentLocation.addPath(producedPath);
+        } else {
+
+        }
+    }
+
+    public void moveEntity(String toLocation, String entityType) {
+        switch (entityType) {
+            case "furniture":
+                if (furniture.contains(entity)) {
+                    furniture.remove(entity);
+                    entity.setLocationName(locationName);
+                    furniture.add(entity);
+                }
+                break;
+            case "character":
+                if (characters.contains(entity)) {
+                    characters.remove(entity);
+                    entity.setLocationName(locationName);
+                    characters.add(entity);
+                }
+                break;
+            case "artefact":
+                if (artefacts.contains(entity)) {
+                    artefacts.remove(entity);
+                    entity.setLocationName(locationName);
+                    artefacts.add(entity);
+                }
+                break;
+            default:
+                throw new IllegalArgumentException();
+        }
+    }
+
+    public Map<String, GameEntity> getAllEntities() {
         return this.allEntities;
     }
 
 
-    public Map<String, Entity> getLocations() {
+    public Map<String, GameEntity> getLocations() {
         return this.locations;
     }
 
-    public Map<String, Entity> getArtefacts() {
+    public Map<String, GameEntity> getArtefacts() {
         return this.artefacts;
     }
 
-    public Map<String, Entity> getFurniture() {
+    public Map<String, GameEntity> getFurniture() {
         return this.furniture;
     }
 
-    public Map<String, Entity> getCharacters() {
+    public Map<String, GameEntity> getCharacters() {
         return this.characters;
     }
 }

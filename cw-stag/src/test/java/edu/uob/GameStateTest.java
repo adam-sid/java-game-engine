@@ -1,10 +1,9 @@
 package edu.uob;
 
-import edu.uob.Entity.Entity;
-import edu.uob.Entity.LocationEntity;
+import edu.uob.GameEntity.GameEntity;
+import edu.uob.GameEntity.LocationGameEntity;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -17,13 +16,13 @@ public class GameStateTest {
     void testEntitiesAddedToGameState() {
         GameStateParser parser = new GameStateParser("basic-entities.dot");
         GameState gameState = parser.getGameState();
-        Map<String, Entity> locations = gameState.getLocations();
+        Map<String, GameEntity> locations = gameState.getLocations();
         assertEquals(4, locations.size());
-        Map<String, Entity> furniture = gameState.getFurniture();
+        Map<String, GameEntity> furniture = gameState.getFurniture();
         assertEquals(2, furniture.size());
-        Map<String, Entity> characters = gameState.getCharacters();
+        Map<String, GameEntity> characters = gameState.getCharacters();
         assertEquals(1, characters.size());
-        Map<String, Entity> artefacts = gameState.getArtefacts();
+        Map<String, GameEntity> artefacts = gameState.getArtefacts();
         assertEquals(4, artefacts.size());
     }
 
@@ -31,9 +30,9 @@ public class GameStateTest {
     void testFurnitureHasLocation() {
         GameStateParser parser = new GameStateParser("basic-entities.dot");
         GameState gameState = parser.getGameState();
-        Map<String, Entity> forestFurniture = gameState.getEntitiesFromLocation(
+        Map<String, GameEntity> forestFurniture = gameState.getEntitiesFromLocation(
                 "furniture", "forest");
-        Entity tree = forestFurniture.values().stream().findFirst().get();
+        GameEntity tree = forestFurniture.values().stream().findFirst().get();
         assertEquals(1, forestFurniture.size());
         assertEquals("tree", tree.getName());
 
@@ -43,15 +42,16 @@ public class GameStateTest {
     void testLocationHasPaths() {
         GameStateParser parser = new GameStateParser("basic-entities.dot");
         GameState gameState = parser.getGameState();
-        LocationEntity forest = (LocationEntity) gameState
+        LocationGameEntity forest = (LocationGameEntity) gameState
                 .getEntitiesFromLocation("location", "forest")
                 .values()
                 .stream()
                 .findFirst()
                 .get();
-        List<LocationEntity> paths = forest.getPaths().stream().toList();
+        Map<String, LocationGameEntity> paths = forest.getPaths();
         assertEquals(1, paths.size());
-        assertEquals("cabin", paths.get(0).getName());
+        LocationGameEntity cabin = paths.get("cabin");
+        assertEquals("cabin", cabin.getName());
     }
 
     @Test
