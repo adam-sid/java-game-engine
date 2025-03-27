@@ -4,6 +4,7 @@ import edu.uob.GameEntity.GameEntity;
 import edu.uob.GameEntity.LocationGameEntity;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -12,9 +13,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class GameStateTest {
 
+    public File entitiesFile = new File("config" + File.separator + "basic-entities.dot");
+
     @Test
     void testEntitiesAddedToGameState() {
-        GameStateParser parser = new GameStateParser("basic-entities.dot");
+        GameStateParser parser = new GameStateParser(entitiesFile);
         GameState gameState = parser.getGameState();
         Map<String, GameEntity> locations = gameState.getLocations();
         assertEquals(4, locations.size());
@@ -28,7 +31,7 @@ public class GameStateTest {
 
     @Test
     void testFurnitureHasLocation() {
-        GameStateParser parser = new GameStateParser("basic-entities.dot");
+        GameStateParser parser = new GameStateParser(entitiesFile);
         GameState gameState = parser.getGameState();
         Map<String, GameEntity> forestFurniture = gameState.getEntitiesFromLocation(
                 "furniture", "forest");
@@ -40,7 +43,7 @@ public class GameStateTest {
 
     @Test
     void testLocationHasPaths() {
-        GameStateParser parser = new GameStateParser("basic-entities.dot");
+        GameStateParser parser = new GameStateParser(entitiesFile);
         GameState gameState = parser.getGameState();
         LocationGameEntity forest = (LocationGameEntity) gameState
                 .getEntitiesFromLocation("location", "forest")
@@ -56,7 +59,7 @@ public class GameStateTest {
 
     @Test
     void testExtendedEntitiesFile() {
-        GameStateParser parser = new GameStateParser("extended-entities.dot");
+        GameStateParser parser = new GameStateParser(entitiesFile);
         GameState gameState = parser.getGameState();
     }
 

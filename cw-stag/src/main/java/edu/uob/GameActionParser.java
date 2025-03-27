@@ -21,14 +21,10 @@ import org.w3c.dom.NodeList;
 public class GameActionParser {
 
     //main method - calls all helpers and ensures file can be found in config
-    public static void parseActionFile(String fileName, GameState gameState) {
+    public static void parseActionFile(File file, GameState gameState) {
         try {
-            String filePath = new StringBuilder("config")
-                    .append(File.separator)
-                    .append(fileName)
-                    .toString();
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-            Document document = builder.parse(filePath);
+            Document document = builder.parse(file);
             Element root = document.getDocumentElement();
             NodeList actions = root.getChildNodes();
             extractActions(gameState, actions);
@@ -49,7 +45,7 @@ public class GameActionParser {
             String narration = null;
             for (int actionChildrenIndex = 0; actionChildrenIndex < actionChildren.getLength(); actionChildrenIndex++) {
                 Node actionChild = actionChildren.item(actionChildrenIndex);
-                String type = actionChild.getNodeName();
+                String type = actionChild.getNodeName().toLowerCase();
                 switch (type) {
                     case "triggers": {
                         triggers.addAll(extractLeafContent(actionChild));
@@ -68,7 +64,7 @@ public class GameActionParser {
                         break;
                     }
                     case "narration": {
-                        narration = actionChild.getTextContent();
+                        narration = actionChild.getTextContent().toLowerCase();
                         break;
                     }
                     default:
@@ -105,15 +101,10 @@ public class GameActionParser {
         for (int i = 0; i < triggerChildren.getLength(); i++) {
             if (triggerChildren.item(i).getNodeType() == Node.ELEMENT_NODE) {
                 Element node = (Element) triggerChildren.item(i);
-                String content = node.getTextContent();
-                System.out.println(content);
+                String content = node.getTextContent().toLowerCase();
                 leafContents.add(content);
             }
         }
         return leafContents;
-    }
-
-    public HashMap<String, HashSet<GameAction>> getActions() {
-        return null;
     }
 }

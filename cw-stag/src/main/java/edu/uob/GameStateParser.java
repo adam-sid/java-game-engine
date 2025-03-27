@@ -16,15 +16,15 @@ import edu.uob.GameEntity.LocationGameEntity;
 //TODO is it redundant to have gameState and parser hold like information
 public class GameStateParser {
 
-    private final String fileName;
+    private final File file;
     private final Map<String, GameEntity> locations;
     private final Map<String, GameEntity> furniture;
     private final Map<String, GameEntity> artefacts;
     private final Map<String, GameEntity> characters;
     private final GameState gameState;
 
-    public GameStateParser(String fileName) {
-        this.fileName = fileName;
+    public GameStateParser(File file) {
+        this.file = file;
         this.locations = new HashMap<String, GameEntity>();
         this.furniture = new HashMap<String, GameEntity>();
         this.artefacts = new HashMap<String, GameEntity>();
@@ -38,12 +38,8 @@ public class GameStateParser {
     }
 
     public void parseEntityFile() {
-        String filePath = new StringBuilder("config")
-                .append(File.separator)
-                .append(this.fileName)
-                .toString();
         try {
-            FileReader reader = new FileReader(filePath);
+            FileReader reader = new FileReader(this.file);
             Parser parser = new Parser(reader);
             parser.parse(reader);
             Graph document = parser.getGraphs().get(0);

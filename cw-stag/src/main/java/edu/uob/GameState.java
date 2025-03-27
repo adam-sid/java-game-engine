@@ -77,6 +77,7 @@ public class GameState {
     }
 
     public void consumeEntity(String entityName) {
+        moveEntity("storeroom", entityName);
 
     }
 
@@ -89,36 +90,16 @@ public class GameState {
             LocationGameEntity producedPath = (LocationGameEntity) locations.get(entityName);
             currentLocation.addPath(producedPath);
         } else {
-
+            moveEntity(toLocation, entityName);
         }
     }
 
-    public void moveEntity(String toLocation, String entityType) {
-        switch (entityType) {
-            case "furniture":
-                if (furniture.contains(entity)) {
-                    furniture.remove(entity);
-                    entity.setLocationName(locationName);
-                    furniture.add(entity);
-                }
-                break;
-            case "character":
-                if (characters.contains(entity)) {
-                    characters.remove(entity);
-                    entity.setLocationName(locationName);
-                    characters.add(entity);
-                }
-                break;
-            case "artefact":
-                if (artefacts.contains(entity)) {
-                    artefacts.remove(entity);
-                    entity.setLocationName(locationName);
-                    artefacts.add(entity);
-                }
-                break;
-            default:
-                throw new IllegalArgumentException();
+    public void moveEntity(String toLocation, String entityName) {
+        if (!allEntities.containsKey(entityName)) {
+            throw new IllegalArgumentException(entityName);
         }
+        GameEntity entityToMove = allEntities.get(entityName);
+        entityToMove.setLocationName(toLocation);
     }
 
     public Map<String, GameEntity> getAllEntities() {

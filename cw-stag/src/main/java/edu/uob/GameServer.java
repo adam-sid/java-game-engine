@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 public final class GameServer {
 
     private static final char END_OF_TRANSMISSION = 4;
+    private final GameState gameState;
 
     public static void main(String[] args) throws IOException {
         File entitiesFile = Paths.get("config" + File.separator + "basic-entities.dot").toAbsolutePath().toFile();
@@ -30,7 +31,9 @@ public final class GameServer {
     */
     // TODO implement server logic here
     public GameServer(File entitiesFile, File actionsFile) {
-
+        GameStateParser stateParser = new GameStateParser(entitiesFile);
+        this.gameState = stateParser.getGameState();
+        GameActionParser.parseActionFile(actionsFile, this.gameState);
     }
 
     /**
@@ -41,7 +44,8 @@ public final class GameServer {
     */
     // TODO implement your server logic here
     public String handleCommand(String command) {
-        return "";
+        GameCommandParser commandParser = new GameCommandParser(command, this.gameState);
+        return commandParser.getResponse();
     }
 
     /**

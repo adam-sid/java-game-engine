@@ -3,6 +3,7 @@ package edu.uob;
 import edu.uob.GameAction.GameAction;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -13,9 +14,11 @@ public class ActionParsingTest {
 
     @Test
     void testParseAction() {
-        GameStateParser stateParser = new GameStateParser("basic-entities.dot");
+        File entitiesFile = new File("config" + File.separator + "basic-entities.dot");
+        File actionsFile = new File("config" + File.separator + "basic-actions.xml");
+        GameStateParser stateParser = new GameStateParser(entitiesFile);
         GameState gameState = stateParser.getGameState();
-        GameActionParser.parseActionFile("basic-actions.xml", gameState);
+        GameActionParser.parseActionFile(actionsFile, gameState);
         Map<String, GameAction> actionHashMap = gameState.getGameActions();
         GameAction cutAction = actionHashMap.get("cut");
     }
