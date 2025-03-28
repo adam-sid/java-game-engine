@@ -11,16 +11,13 @@ public class InventoryCommand {
     public static String execute(GameState gameState, String playerName) {
         StringBuilder builder = new StringBuilder();
         PlayerEntity player = (PlayerEntity) gameState.getEntityMap("player").get(playerName);
-
         Map<String, GameEntity> invEntities = player.getInventory();
-
         for (String invEntity : invEntities.keySet()) {
             if (!builder.isEmpty()) {
                 builder.append(", "); // Add a comma and space between entity names
             }
             builder.append(invEntity);
         }
-
         return builder.toString();
     }
 }

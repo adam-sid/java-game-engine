@@ -60,7 +60,7 @@ public class EntityFileParser {
             String locationName = locationDetails.getId().getId().toLowerCase();
             String locationDescription = locationDetails.getAttribute("description").toLowerCase();
             this.locations.put(locationName, new LocationEntity(locationName, locationDescription));
-            if (this.startLocationName != null) {
+            if (this.startLocationName == null) {
                 this.startLocationName = locationName;
             }
             List<Graph> features = location.getSubgraphs();

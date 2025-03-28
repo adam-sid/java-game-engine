@@ -10,8 +10,12 @@ public class PlayerEntity extends GameEntity{
 
     //player entities are not assigned a description: TODO lets make a random player description generator
     public PlayerEntity(String name, String locationName) {
-        super(name, "I'm a player!", locationName);
+        super(name, playerDescriptor(), locationName);
         this.health = 3;
+    }
+
+    private static String playerDescriptor() {
+        return "Player";
     }
 
     @Override
@@ -20,6 +24,11 @@ public class PlayerEntity extends GameEntity{
         for (GameEntity invEntity : inventory.values()) {
             invEntity.setLocationName(newLocationName);
         }
+    }
+
+    @Override
+    public String getName() {
+        return this.name.replace("(player)", "").trim();
     }
 
     public void increaseHealth() {

@@ -108,6 +108,9 @@ public class GameState {
     }
 
     public void moveFromInventory(String playerName, String artefactName) {
-
+        PlayerEntity player = (PlayerEntity) this.players.get(playerName);
+        GameEntity artefactToMove = this.artefacts.get(artefactName);
+        player.removeInventory(artefactToMove);
+        this.artefacts.put(artefactName, artefactToMove);
     }
 }

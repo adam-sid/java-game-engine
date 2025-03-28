@@ -15,16 +15,16 @@ public class GameEntity
 
     public String getName()
     {
-        return name;
+        return this.name;
     }
 
     public String getDescription()
     {
-        return description;
+        return this.description;
     }
 
     public String getLocationName() {
-        return locationName;
+        return this.locationName;
     }
 
     public void setLocationName(String newLocationName) {
