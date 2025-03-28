@@ -1,11 +1,10 @@
 package edu.uob.GameEntity;
 
-// TODO this was previously abstract - changed so I could directly instantiate game entities
 public class GameEntity
 {
-    private final String name;
-    private final String description;
-    private String locationName;
+    protected final String name;
+    protected final String description;
+    protected String locationName;
 
     public GameEntity(String name, String description, String locationName)
     {

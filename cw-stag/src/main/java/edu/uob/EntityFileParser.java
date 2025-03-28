@@ -11,26 +11,29 @@ import com.alexmerz.graphviz.objects.Graph;
 import com.alexmerz.graphviz.objects.Node;
 import com.alexmerz.graphviz.objects.Edge;
 import edu.uob.GameEntity.GameEntity;
-import edu.uob.GameEntity.LocationGameEntity;
+import edu.uob.GameEntity.LocationEntity;
 
 //TODO is it redundant to have gameState and parser hold like information
-public class GameStateParser {
+public class EntityFileParser {
 
     private final File file;
     private final Map<String, GameEntity> locations;
+    private String startLocationName;
     private final Map<String, GameEntity> furniture;
     private final Map<String, GameEntity> artefacts;
     private final Map<String, GameEntity> characters;
     private final GameState gameState;
 
-    public GameStateParser(File file) {
+    public EntityFileParser(File file) {
         this.file = file;
         this.locations = new HashMap<String, GameEntity>();
+        this.startLocationName = null;
         this.furniture = new HashMap<String, GameEntity>();
         this.artefacts = new HashMap<String, GameEntity>();
         this.characters = new HashMap<String, GameEntity>();
         this.parseEntityFile();
-        this.gameState = new GameState(this.locations, this.furniture, this.artefacts, this.characters);
+        this.gameState = new GameState(this.locations, this.startLocationName,
+                this.furniture, this.artefacts, this.characters);
     }
 
     public GameState getGameState() {
@@ -56,7 +59,10 @@ public class GameStateParser {
             Node locationDetails = location.getNodes(false).get(0);
             String locationName = locationDetails.getId().getId().toLowerCase();
             String locationDescription = locationDetails.getAttribute("description").toLowerCase();
-            this.locations.put(locationName, new LocationGameEntity(locationName, locationDescription, locationName));
+            this.locations.put(locationName, new LocationEntity(locationName, locationDescription));
+            if (this.startLocationName != null) {
+                this.startLocationName = locationName;
+            }
             List<Graph> features = location.getSubgraphs();
             this.parseEntities(features, locationName);
         }
@@ -93,8 +99,8 @@ public class GameStateParser {
             String fromName = fromLocation.getId().getId().toLowerCase();
             String toName = toLocation.getId().getId().toLowerCase();
 
-            LocationGameEntity fromLocationObj = (LocationGameEntity) locations.get(fromName);
-            LocationGameEntity toLocationObj = (LocationGameEntity) locations.get(toName);
+            LocationEntity fromLocationObj = (LocationEntity) locations.get(fromName);
+            LocationEntity toLocationObj = (LocationEntity) locations.get(toName);
 
             if (fromLocationObj != null && toLocationObj != null) {
                 fromLocationObj.addPath(toLocationObj);

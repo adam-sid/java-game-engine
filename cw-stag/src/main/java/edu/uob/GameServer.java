@@ -31,9 +31,9 @@ public final class GameServer {
     */
     // TODO implement server logic here
     public GameServer(File entitiesFile, File actionsFile) {
-        GameStateParser stateParser = new GameStateParser(entitiesFile);
+        EntityFileParser stateParser = new EntityFileParser(entitiesFile);
         this.gameState = stateParser.getGameState();
-        GameActionParser.parseActionFile(actionsFile, this.gameState);
+        ActionFileParser.parseActionFile(actionsFile, this.gameState);
     }
 
     /**
@@ -44,8 +44,7 @@ public final class GameServer {
     */
     // TODO implement your server logic here
     public String handleCommand(String command) {
-        GameCommandParser commandParser = new GameCommandParser(command, this.gameState);
-        return commandParser.getResponse();
+        return CommandParser.parseCommand(command, this.gameState);
     }
 
     /**

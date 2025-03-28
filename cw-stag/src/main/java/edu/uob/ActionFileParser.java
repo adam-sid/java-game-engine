@@ -18,7 +18,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-public class GameActionParser {
+public class ActionFileParser {
 
     //main method - calls all helpers and ensures file can be found in config
     public static void parseActionFile(File file, GameState gameState) {
@@ -76,7 +76,7 @@ public class GameActionParser {
             Map<String, GameEntity> consumedEntities = lookUpEntities(gameState, consumed);
             GameAction gameAction = new GameAction(subjectEntities, consumedEntities, producedEntities, narration);
             for (String trigger: triggers) {
-                gameState.setGameAction(trigger, gameAction);
+                gameState.addGameAction(trigger, gameAction);
             }
         }
     }
@@ -85,7 +85,7 @@ public class GameActionParser {
     private static Map<String, GameEntity> lookUpEntities(GameState gameState, Set<String> subjects) {
         Map<String, GameEntity> entities = new HashMap<>();
         for (String entityName : subjects) {
-            GameEntity subjectEntity = gameState.getAllEntities().get(entityName);
+            GameEntity subjectEntity = gameState.getEntityMap("all").get(entityName);
             if (subjectEntity == null) {
                 throw new RuntimeException(entityName);
             }

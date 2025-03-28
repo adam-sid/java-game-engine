@@ -4,8 +4,6 @@ import edu.uob.GameAction.GameAction;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -16,9 +14,9 @@ public class ActionParsingTest {
     void testParseAction() {
         File entitiesFile = new File("config" + File.separator + "basic-entities.dot");
         File actionsFile = new File("config" + File.separator + "basic-actions.xml");
-        GameStateParser stateParser = new GameStateParser(entitiesFile);
+        EntityFileParser stateParser = new EntityFileParser(entitiesFile);
         GameState gameState = stateParser.getGameState();
-        GameActionParser.parseActionFile(actionsFile, gameState);
+        ActionFileParser.parseActionFile(actionsFile, gameState);
         Map<String, GameAction> actionHashMap = gameState.getGameActions();
         GameAction cutAction = actionHashMap.get("cut");
     }
