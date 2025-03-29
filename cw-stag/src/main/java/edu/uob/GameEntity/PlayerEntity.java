@@ -21,7 +21,7 @@ public class PlayerEntity extends GameEntity{
     @Override
     public void setLocationName(String newLocationName) {
         this.locationName = newLocationName;
-        for (GameEntity invEntity : inventory.values()) {
+        for (GameEntity invEntity : this.inventory.values()) {
             invEntity.setLocationName(newLocationName);
         }
     }

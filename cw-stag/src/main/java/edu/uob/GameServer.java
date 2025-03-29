@@ -15,9 +15,14 @@ public final class GameServer {
     private static final char END_OF_TRANSMISSION = 4;
     private final GameState gameState;
 
+    //todo make this work on any file not just basic ones
+    //what is the point of this function?
     public static void main(String[] args) throws IOException {
-        File entitiesFile = Paths.get("config" + File.separator + "basic-entities.dot").toAbsolutePath().toFile();
-        File actionsFile = Paths.get("config" + File.separator + "basic-actions.xml").toAbsolutePath().toFile();
+        StringBuilder configFolderPath = new StringBuilder("config").append(File.separator);
+        File entitiesFile = Paths.get(configFolderPath.append("basic-entities.dot").toString())
+                .toAbsolutePath().toFile();
+        File actionsFile = Paths.get(configFolderPath.append("basic-actions.xml").toString()).
+                toAbsolutePath().toFile();
         GameServer server = new GameServer(entitiesFile, actionsFile);
         server.blockingListenOn(8888);
     }
@@ -56,10 +61,12 @@ public final class GameServer {
     */
     public void blockingListenOn(int portNumber) throws IOException {
         try (ServerSocket s = new ServerSocket(portNumber)) {
-            System.out.println("Server listening on port " + portNumber);
+            StringBuilder buildResponse = new StringBuilder("Server listening on port ")
+                    .append(portNumber);
+            System.out.println(buildResponse);
             while (!Thread.interrupted()) {
                 try {
-                    blockingHandleConnection(s);
+                    this.blockingHandleConnection(s);
                 } catch (IOException e) {
                     System.out.println("Connection closed");
                 }
@@ -81,10 +88,15 @@ public final class GameServer {
             System.out.println("Connection established");
             String incomingCommand = reader.readLine();
             if(incomingCommand != null) {
-                System.out.println("Received message from " + incomingCommand);
-                String result = handleCommand(incomingCommand);
+                StringBuilder buildResponse = new StringBuilder("Received message from ")
+                        .append(incomingCommand);
+                System.out.println(buildResponse);
+                String result = this.handleCommand(incomingCommand);
                 writer.write(result);
-                writer.write("\n" + END_OF_TRANSMISSION + "\n");
+                StringBuilder buildEOT = new StringBuilder("\n")
+                        .append(END_OF_TRANSMISSION)
+                        .append("\n");
+                writer.write(buildEOT.toString());
                 writer.flush();
             }
         }
