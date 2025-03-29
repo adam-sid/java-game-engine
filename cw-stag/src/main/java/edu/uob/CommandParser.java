@@ -15,7 +15,7 @@ public class CommandParser {
     );
 
     public static String parseCommand(String command, GameState gameState) {
-        LinkedList<String> tokenList = tokeniseString(command);
+        LinkedList<String> tokenList = CommandParser.tokeniseString(command);
         if (tokenList.isEmpty()) {
             return ResponseList.noUserName();
         } else if (tokenList.size() < 2) {
@@ -28,7 +28,7 @@ public class CommandParser {
         if (!gameState.getEntityMap("player").containsKey(playerName)) {
             gameState.addPlayer(playerName);
         }
-        return parseAction(tokenList, gameState);
+        return CommandParser.parseAction(tokenList, gameState);
     }
 
     private static String parseAction(LinkedList<String> tokenList, GameState gameState) {
@@ -48,23 +48,23 @@ public class CommandParser {
                     .findFirst()
                     .get();
             int actionIndex = tokenList.indexOf(action);
-            return parseBasicAction(tokenList, gameState, tokenList.get(actionIndex));
+            return CommandParser.parseBasicAction(tokenList, gameState, tokenList.get(actionIndex));
         }
-        return parseCustomAction(tokenList, gameState);
+        return CommandParser.parseCustomAction(tokenList, gameState);
     }
 
     private static String parseBasicAction(LinkedList<String> tokenList, GameState gameState, String basicAction) {
         switch (basicAction) {
             case "inventory":
-                return parseInventory(tokenList, gameState);
+                return CommandParser.parseInventory(tokenList, gameState);
             case "inv":
-                return parseInventory(tokenList, gameState);
+                return CommandParser.parseInventory(tokenList, gameState);
             case "get":
-                return parseGet(tokenList, gameState);
+                return CommandParser.parseGet(tokenList, gameState);
             case "drop":
-                return parseDrop(tokenList, gameState);
+                return CommandParser.parseDrop(tokenList, gameState);
             case "goto":
-                return parseGoTo(tokenList, gameState);
+                return CommandParser.parseGoTo(tokenList, gameState);
             case "look":
                 return LookCommand.execute(gameState, tokenList.get(0));
             default:

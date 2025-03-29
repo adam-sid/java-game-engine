@@ -74,7 +74,7 @@ public class GameState {
     }
 
     public void consumeEntity(String entityName) {
-        moveEntity("storeroom", entityName);
+        this.moveEntity("storeroom", entityName);
 
     }
 
@@ -88,7 +88,7 @@ public class GameState {
             LocationEntity producedPath = (LocationEntity) locations.get(entityName);
             currentLocation.addPath(producedPath);
         } else {
-            moveEntity(toLocation, entityName);
+            this.moveEntity(toLocation, entityName);
         }
     }
     //TODO exceptions may not be worth having - impossible to be thrown?

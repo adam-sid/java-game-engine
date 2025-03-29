@@ -32,7 +32,6 @@ public class LookCommand {
             builder.append(pathName);
         }
         String path = LookCommand.class.getProtectionDomain().getCodeSource().getLocation().getPath();
-        System.out.println("Current class path: " + path);
         return builder.toString();
     }
 }

@@ -27,7 +27,7 @@ public class ActionFileParser {
             Document document = builder.parse(file);
             Element root = document.getDocumentElement();
             NodeList actions = root.getChildNodes();
-            extractActions(gameState, actions);
+            ActionFileParser.extractActions(gameState, actions);
         } catch (ParserConfigurationException | IOException | SAXException e) {
             throw new RuntimeException(e);
         }

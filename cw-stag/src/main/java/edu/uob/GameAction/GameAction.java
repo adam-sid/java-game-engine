@@ -21,19 +21,19 @@ public class GameAction
     }
 
     public Map<String, GameEntity> getSubjectEntities() {
-        return subjectEntities;
+        return this.subjectEntities;
     }
 
     public Map<String, GameEntity> getConsumedEntities() {
-        return consumedEntities;
+        return this.consumedEntities;
     }
 
     public Map<String, GameEntity> getProducedEntities() {
-        return producedEntities;
+        return this.producedEntities;
     }
 
     public String getNarration() {
-        return narration;
+        return this.narration;
     }
 
 }
