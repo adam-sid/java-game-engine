@@ -19,4 +19,9 @@ public class LocationEntity extends GameEntity {
     public void addPath(LocationEntity location) {
         this.paths.put(location.getName(), location);
     }
+
+    public void removePath(String locationName) {
+        this.paths.remove(locationName);
+    }
+
 }

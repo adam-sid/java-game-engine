@@ -65,6 +65,31 @@ public class GameState {
         return filteredEntities;
     }
 
+    public String getEntityTypeFromName(String entityName) {
+        entityName = entityName.toLowerCase();
+        String playerName = Utils.addPlayerTag(entityName);
+        if (!(this.allEntities.containsKey(entityName) ||
+                this.allEntities.containsKey(playerName))) {
+            return null;
+        }
+        if (this.furniture.containsKey(entityName)) return "furniture";
+        if (this.characters.containsKey(entityName))return "character";
+        if (this.artefacts.containsKey(entityName)) return "artefact";
+        if (this.locations.containsKey(entityName)) return "location";
+        if (this.players.containsKey(entityName) || this.players.containsKey(playerName)) return "player";
+        else {
+            return null;
+        }
+    }
+
+    public String getPlayerLocation(String playerName) {
+        if (this.players.containsKey(playerName)) {
+            return this.players.get(playerName).getLocationName();
+        } else {
+            throw new RuntimeException(playerName);
+        }
+    }
+
     public Map<String, GameAction> getGameActions() {
         return gameActions;
     }
@@ -73,22 +98,29 @@ public class GameState {
         this.gameActions.put(triggerName, gameAction);
     }
 
-    public void consumeEntity(String entityName) {
-        this.moveEntity("storeroom", entityName);
-
-    }
-
-    //TODO exceptions may not be worth having - impossible to be thrown?
-    public void produceEntity(String toLocation, String entityName) {
+    public void consumeEntity(String targetLocationName, String entityName) {
         if (!allEntities.containsKey(entityName)) {
             throw new IllegalArgumentException(entityName);
         }
-        LocationEntity currentLocation = (LocationEntity) locations.get(entityName);
         if (locations.containsKey(entityName)) {
-            LocationEntity producedPath = (LocationEntity) locations.get(entityName);
-            currentLocation.addPath(producedPath);
+            LocationEntity targetLocation = (LocationEntity) locations.get(targetLocationName);
+            targetLocation.removePath(entityName);
         } else {
-            this.moveEntity(toLocation, entityName);
+            this.moveEntity("storeroom", entityName);
+        }
+    }
+
+    //TODO exceptions may not be worth having - impossible to be thrown?
+    public void produceEntity(String targetLocationName, String entityName) {
+        if (!allEntities.containsKey(entityName)) {
+            throw new IllegalArgumentException(entityName);
+        }
+        if (locations.containsKey(entityName)) {
+            LocationEntity targetLocation = (LocationEntity) locations.get(targetLocationName);
+            LocationEntity producedPath = (LocationEntity) locations.get(entityName);
+            targetLocation.addPath(producedPath);
+        } else {
+            this.moveEntity(targetLocationName, entityName);
         }
     }
     //TODO exceptions may not be worth having - impossible to be thrown?
@@ -105,12 +137,14 @@ public class GameState {
         GameEntity artefactToMove = this.artefacts.get(artefactName);
         player.addInventory(artefactToMove);
         this.artefacts.remove(artefactName);
+        this.allEntities.remove(artefactName);
     }
 
     public void moveFromInventory(String playerName, String artefactName) {
         PlayerEntity player = (PlayerEntity) this.players.get(playerName);
-        GameEntity artefactToMove = this.artefacts.get(artefactName);
-        player.removeInventory(artefactToMove);
+        GameEntity artefactToMove = player.getInventory().get(artefactName);
+        player.removeInventory(artefactName);
         this.artefacts.put(artefactName, artefactToMove);
+        this.allEntities.put(artefactName, artefactToMove);
     }
 }

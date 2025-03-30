@@ -19,10 +19,10 @@ public final class GameServer {
     //what is the point of this function?
     public static void main(String[] args) throws IOException {
         StringBuilder configFolderPath = new StringBuilder("config").append(File.separator);
-        File entitiesFile = Paths.get(configFolderPath.append("basic-entities.dot").toString())
+        File entitiesFile = Paths.get(configFolderPath.toString(), "extended-entities.dot" )
                 .toAbsolutePath().toFile();
-        File actionsFile = Paths.get(configFolderPath.append("basic-actions.xml").toString()).
-                toAbsolutePath().toFile();
+        File actionsFile = Paths.get(configFolderPath.toString(), "extended-actions.xml" )
+                .toAbsolutePath().toFile();
         GameServer server = new GameServer(entitiesFile, actionsFile);
         server.blockingListenOn(8888);
     }

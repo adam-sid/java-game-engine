@@ -2,10 +2,8 @@ package edu.uob;
 
 import java.io.IOException;
 import java.io.File;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Predicate;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
@@ -39,9 +37,9 @@ public class ActionFileParser {
             Element action = (Element) actions.item(actionIndex);
             NodeList actionChildren = action.getChildNodes();
             Set<String> triggers = new HashSet<>();
-            Set<String> subjects = new HashSet<>();
-            Set<String> produced = new HashSet<>();
-            Set<String> consumed = new HashSet<>();
+            List<String> subjects = new LinkedList<>();
+            List<String> produced = new LinkedList<>();
+            List<String> consumed = new LinkedList<>();
             String narration = null;
             for (int actionChildrenIndex = 0; actionChildrenIndex < actionChildren.getLength(); actionChildrenIndex++) {
                 Node actionChild = actionChildren.item(actionChildrenIndex);
@@ -75,21 +73,30 @@ public class ActionFileParser {
             Map<String, GameEntity> producedEntities = lookUpEntities(gameState, produced);
             Map<String, GameEntity> consumedEntities = lookUpEntities(gameState, consumed);
             GameAction gameAction = new GameAction(subjectEntities, consumedEntities, producedEntities, narration);
+            setChangeInHealth(gameAction, produced, consumed);
             for (String trigger: triggers) {
                 gameState.addGameAction(trigger, gameAction);
             }
         }
     }
 
+    private static void setChangeInHealth(GameAction gameAction, List<String> produced, List<String> consumed) {
+        int plusHealth = (int) produced.stream().filter(Predicate.isEqual("health")).count();
+        int minusHealth = (int) consumed.stream().filter(Predicate.isEqual("health")).count();
+        gameAction.setChangeInHealth(plusHealth - minusHealth);
+    }
+
     //checks whether entities exist in the game state, if not throws exception as action file is faulty
-    private static Map<String, GameEntity> lookUpEntities(GameState gameState, Set<String> subjects) {
+    private static Map<String, GameEntity> lookUpEntities(GameState gameState, List<String> subjects) {
         Map<String, GameEntity> entities = new HashMap<>();
         for (String entityName : subjects) {
-            GameEntity subjectEntity = gameState.getEntityMap("all").get(entityName);
-            if (subjectEntity == null) {
-                throw new RuntimeException(entityName);
+            if (!Objects.equals(entityName, "health")) {
+                GameEntity subjectEntity = gameState.getEntityMap("all").get(entityName);
+                if (subjectEntity == null) {
+                    throw new RuntimeException(entityName);
+                }
+                entities.put(entityName, subjectEntity);
             }
-            entities.put(entityName, subjectEntity);
         }
         return entities;
     }

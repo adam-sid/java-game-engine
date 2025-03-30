@@ -14,7 +14,7 @@ public class InventoryCommand {
         Map<String, GameEntity> invEntities = player.getInventory();
         for (String invEntity : invEntities.keySet()) {
             if (!builder.isEmpty()) {
-                builder.append(", "); // Add a comma and space between entity names
+                builder.append("\n");
             }
             builder.append(invEntity);
         }

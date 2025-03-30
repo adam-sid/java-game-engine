@@ -12,7 +12,7 @@ public class CustomCommand {
         Map<String, GameEntity> consumedEntities = action.getConsumedEntities();
         String playerLocation = gameState.getEntityMap("player").get(playerName).getLocationName();
         for (String entityName : consumedEntities.keySet()) {
-            gameState.consumeEntity(entityName);
+            gameState.consumeEntity(playerLocation, entityName);
         }
         Map<String, GameEntity> producedEntities = action.getProducedEntities();
         for (String entityName : producedEntities.keySet()) {

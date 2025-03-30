@@ -26,11 +26,6 @@ public class PlayerEntity extends GameEntity{
         }
     }
 
-    @Override
-    public String getName() {
-        return this.name.replace("(player)", "").trim();
-    }
-
     public void increaseHealth() {
         this.health++;
     }
@@ -48,10 +43,10 @@ public class PlayerEntity extends GameEntity{
     }
 
     public void addInventory(GameEntity invEntity) {
-        this.inventory.put(invEntity.getName(), invEntity );
+        this.inventory.put(invEntity.getName(), invEntity);
     }
 
-    public void removeInventory(GameEntity invEntity) {
-        this.inventory.remove(invEntity.getName());
+    public void removeInventory(String invName) {
+        this.inventory.remove(invName);
     }
 }

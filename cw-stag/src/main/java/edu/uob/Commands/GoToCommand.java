@@ -8,7 +8,7 @@ import java.util.Map;
 public class GoToCommand {
 
     public static String execute(GameState gameState, String playerName, String nextLocationName) {
-        GameEntity playerToMove = gameState.getEntityMap("player").get(playerName);
+        PlayerEntity playerToMove = (PlayerEntity) gameState.getEntityMap("player").get(playerName);
         gameState.moveEntity(nextLocationName, playerToMove.getName() );
         return "You moved to a new location!";
     }
