@@ -90,6 +90,14 @@ public class GameState {
         }
     }
 
+    public PlayerEntity getPlayer(String playerName) {
+        if (this.players.containsKey(playerName)) {
+            return (PlayerEntity) this.players.get(playerName);
+        } else {
+            throw new RuntimeException(playerName);
+        }
+    }
+
     public Map<String, GameAction> getGameActions() {
         return gameActions;
     }
@@ -98,13 +106,16 @@ public class GameState {
         this.gameActions.put(triggerName, gameAction);
     }
 
-    public void consumeEntity(String targetLocationName, String entityName) {
-        if (!allEntities.containsKey(entityName)) {
+    public void consumeEntity(String targetLocationName, String entityName, PlayerEntity player) {
+        Map<String, GameEntity> playerInventory = player.getInventory();
+        if (!(allEntities.containsKey(entityName) || playerInventory.containsKey(entityName))) {
             throw new IllegalArgumentException(entityName);
         }
         if (locations.containsKey(entityName)) {
             LocationEntity targetLocation = (LocationEntity) locations.get(targetLocationName);
             targetLocation.removePath(entityName);
+        } else if (playerInventory.containsKey(entityName)) {
+            playerInventory.remove(entityName);
         } else {
             this.moveEntity("storeroom", entityName);
         }
@@ -146,5 +157,14 @@ public class GameState {
         player.removeInventory(artefactName);
         this.artefacts.put(artefactName, artefactToMove);
         this.allEntities.put(artefactName, artefactToMove);
+    }
+
+    public void resetPlayer(PlayerEntity player) {
+        Map<String, GameEntity> playerInventory = player.getInventory();
+        for (String entityName : playerInventory.keySet()) {
+            moveFromInventory(player.getName(), entityName);
+        }
+        player.setLocationName(this.startLocationName);
+        player.modifyHealth(3);
     }
 }

@@ -11,7 +11,7 @@ import java.util.*;
 public class CommandParser {
 
     private static final Set<String> BASIC_ACTIONS = Set.of(
-            "inventory", "inv", "get", "drop", "goto", "look"
+            "inventory", "inv", "get", "drop", "goto", "look", "health"
     );
 
     public static String parseCommand(String command, GameState gameState) {
@@ -41,36 +41,81 @@ public class CommandParser {
             int actionIndex = tokenList.indexOf(action);
             return CommandParser.parseBasicAction(tokenList, gameState, tokenList.get(actionIndex));
         } else if (basicActionCount == 0) {
-            if (parseCustomAction(tokenList, gameState)) {
-
+            Map <String, GameAction> executableActionMap = parseCustomAction(tokenList, gameState);
+            boolean actionsAreSame = executableActionMap.values().stream().distinct().count() == 1;
+            if (executableActionMap.size() == 1 || (executableActionMap.size() > 1 && actionsAreSame)) {
+                String trigger = executableActionMap.keySet().iterator().next();
+                GameAction triggeredAction = gameState.getGameActions().get(trigger);
+                return CustomCommand.execute(gameState, triggeredAction, tokenList.get(0));
+            } else if (!executableActionMap.isEmpty()) {
+                return ResponseList.ambiguousCommand();
             }
         }
         return ResponseList.noActionFound();
     }
-    //TODO restart from here tomoz
-    private static boolean parseCustomAction(LinkedList<String> tokenList, GameState gameState) {
+
+    //TODO work on rejecting extraneous subjects
+
+    private static Map <String, GameAction> parseCustomAction(LinkedList<String> tokenList, GameState gameState) {
         Map<String, GameAction> customActionMap = gameState.getGameActions();
-        for (Map.Entry<String, GameAction> entry : customActionMap.entrySet()) {
-            String triggerPhrase = entry.getKey();
-            if (triggerPhrase.contains(" ")) {
-                LinkedList<String> triggerTokens = new LinkedList<>();
-                tokeniseString(triggerPhrase, triggerTokens);
-                for (int i = 0; i <= tokenList.size() - triggerTokens.size(); i++) {
-                    boolean match = true;
-                    for (int j = 0; j < triggerTokens.size(); j++) {
-                        if (!tokenList.get(i + j).equalsIgnoreCase(triggerTokens.get(j))) {
-                            match = false;
-                            break;
-                        }
+        Map <String, GameAction> executableActionMap = new HashMap<>();
+        for (Map.Entry<String, GameAction> actionEntry : customActionMap.entrySet()) {
+            String triggerPhrase = actionEntry.getKey();
+            LinkedList<String> triggerTokens = new LinkedList<>();
+            if (!triggerPhrase.contains(" ")) {
+                if (tokenList.contains(triggerPhrase)) {
+                    triggerTokens.add(triggerPhrase);
+                    if(canActionExecute(gameState, tokenList, actionEntry.getValue())) {
+                        executableActionMap.put(triggerPhrase, actionEntry.getValue());
                     }
-                    if (match) {
-                        return true;
+                }
+            } else {
+                tokeniseString(triggerPhrase, triggerTokens);
+                if (commandContainsTrigger(tokenList, triggerTokens)) {
+                    if(canActionExecute(gameState, tokenList, actionEntry.getValue())) {
+                        executableActionMap.put(triggerPhrase, actionEntry.getValue());
                     }
                 }
             }
 
         }
+        return executableActionMap;
+    }
+
+    private static boolean commandContainsTrigger(LinkedList<String> tokenList, LinkedList<String> triggerTokens) {
+        if (triggerTokens.size() > tokenList.size() - 1) {
+            return false;
+        }
+        int triggerIndex = 0;
+        for (String token : tokenList) {
+            if (token.equals(triggerTokens.get(triggerIndex))) {
+                triggerIndex++;
+                if (triggerIndex == triggerTokens.size() - 1) {
+                    return true;
+                }
+            } else {
+                triggerIndex = 0;
+            }
+        }
         return false;
+    }
+
+    private static Boolean canActionExecute(GameState gameState, LinkedList<String> tokenList,
+                                            GameAction triggeredAction) {
+        Map<String, GameEntity> actionSubjects = triggeredAction.getSubjectEntities();
+        PlayerEntity player = gameState.getPlayer(tokenList.get(0));
+        Map<String, GameEntity> subjectsInLocation = gameState.
+                getEntitiesFromLocation("all", player.getLocationName());
+        Map<String, GameEntity> subjectsInInventory = player.getInventory();
+        Map<String, GameEntity> availableSubjects = new HashMap<>(subjectsInLocation);
+        availableSubjects.putAll(subjectsInInventory);
+        boolean subjectsAvailable = availableSubjects.keySet().containsAll(actionSubjects.keySet());
+        boolean subjectInString = actionSubjects.keySet().stream().anyMatch(tokenList::contains);
+        if (subjectsAvailable && subjectInString) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private static String parseBasicAction(LinkedList<String> tokenList, GameState gameState, String basicAction) {
@@ -85,8 +130,18 @@ public class CommandParser {
                 return CommandParser.parseGoTo(tokenList, gameState);
             case "look":
                 return CommandParser.parseLook(tokenList, gameState);
+            case "health":
+                return CommandParser.parseHealth(tokenList, gameState);
             default:
                 return ResponseList.noActionFound();
+        }
+    }
+
+    private static String parseHealth(LinkedList<String> tokenList, GameState gameState) {
+        if (tokenList.get(1).equals("health") && tokenList.size() == 2) {
+            return HealthCommand.execute(gameState, tokenList.get(0));
+        } else {
+            return ResponseList.badHealthCommand();
         }
     }
 
@@ -178,7 +233,6 @@ public class CommandParser {
         }
     }
 
-    //TODO make this deal with punctuation - although apparently this isn't tested
     private static LinkedList<String> tokeniseCommandString(String command) {
         LinkedList<String> tokenList = new LinkedList<>();
         if (!command.contains(":")) {
@@ -198,6 +252,4 @@ public class CommandParser {
             tokenList.add(rawToken.trim().replaceAll("\\s+", ""));
         }
     }
-
-
 }

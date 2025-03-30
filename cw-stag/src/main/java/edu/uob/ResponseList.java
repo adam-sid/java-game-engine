@@ -81,4 +81,16 @@ public class ResponseList {
     public static String pathDoesNotExist() {
         return "You cannot see a path to that location";
     }
+
+    public static String multipleActionFound() {
+        return "Multiple actions found";
+    }
+
+    public static String ambiguousCommand() {
+        return "Command is ambiguous";
+    }
+
+    public static String badHealthCommand() {
+        return "I don't understand that command, maybe you meant 'health'?";
+    }
 }

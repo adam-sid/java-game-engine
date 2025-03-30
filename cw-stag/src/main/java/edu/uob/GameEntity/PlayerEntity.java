@@ -26,12 +26,14 @@ public class PlayerEntity extends GameEntity{
         }
     }
 
-    public void increaseHealth() {
-        this.health++;
-    }
-
-    public void decreaseHealth() {
-        this.health--;
+    public boolean modifyHealth(int changeInHealth) {
+        if (changeInHealth >= 0) {
+            this.health = Math.min(3, this.health + changeInHealth);
+            return true;
+        } else {
+            this.health = Math.max(0, this.health + changeInHealth);
+            return this.health > 0;
+        }
     }
 
     public int getHealth() {
