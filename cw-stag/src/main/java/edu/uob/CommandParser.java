@@ -15,7 +15,7 @@ public class CommandParser {
     );
 
     public static String parseCommand(String command, GameState gameState) {
-        LinkedList<String> tokenList = CommandParser.tokeniseString(command);
+        LinkedList<String> tokenList = CommandParser.tokeniseCommandString(command);
         if (tokenList.isEmpty()) {
             return ResponseList.noUserName();
         } else if (tokenList.size() < 2) {
@@ -32,7 +32,6 @@ public class CommandParser {
 
     private static String parseAction(LinkedList<String> tokenList, GameState gameState) {
         //first check if there is 1 basic action - if 2+ then reject immediately
-        Map<String, GameAction> customActionMap = gameState.getGameActions();
         int basicActionCount = (int) tokenList.stream().filter(BASIC_ACTIONS :: contains).count();
         if (basicActionCount == 1) {
             String action = tokenList.stream()
@@ -42,18 +41,36 @@ public class CommandParser {
             int actionIndex = tokenList.indexOf(action);
             return CommandParser.parseBasicAction(tokenList, gameState, tokenList.get(actionIndex));
         } else if (basicActionCount == 0) {
+            if (parseCustomAction(tokenList, gameState)) {
+
+            }
+        }
+        return ResponseList.noActionFound();
+    }
+    //TODO restart from here tomoz
+    private static boolean parseCustomAction(LinkedList<String> tokenList, GameState gameState) {
+        Map<String, GameAction> customActionMap = gameState.getGameActions();
+        for (Map.Entry<String, GameAction> entry : customActionMap.entrySet()) {
+            String triggerPhrase = entry.getKey();
+            if (triggerPhrase.contains(" ")) {
+                LinkedList<String> triggerTokens = new LinkedList<>();
+                tokeniseString(triggerPhrase, triggerTokens);
+                for (int i = 0; i <= tokenList.size() - triggerTokens.size(); i++) {
+                    boolean match = true;
+                    for (int j = 0; j < triggerTokens.size(); j++) {
+                        if (!tokenList.get(i + j).equalsIgnoreCase(triggerTokens.get(j))) {
+                            match = false;
+                            break;
+                        }
+                    }
+                    if (match) {
+                        return true;
+                    }
+                }
+            }
 
         }
-        //fix below
-
-        int customActionCount = (int) customActionMap.keySet().stream().filter(tokenList :: contains).count();
-        int actionCount = customActionCount + basicActionCount;
-        if (actionCount > 1) {
-            return ResponseList.tooManyActions();
-        } else if (actionCount == 0) {
-            return ResponseList.noActionFound();
-        }
-        return CommandParser.parseCustomAction(tokenList, gameState);
+        return false;
     }
 
     private static String parseBasicAction(LinkedList<String> tokenList, GameState gameState, String basicAction) {
@@ -161,13 +178,8 @@ public class CommandParser {
         }
     }
 
-    private static String parseCustomAction(LinkedList<String> tokenList, GameState gameState) {
-        return null;
-
-    }
-
     //TODO make this deal with punctuation - although apparently this isn't tested
-    private static LinkedList<String> tokeniseString(String command) {
+    private static LinkedList<String> tokeniseCommandString(String command) {
         LinkedList<String> tokenList = new LinkedList<>();
         if (!command.contains(":")) {
             return tokenList;
@@ -175,12 +187,16 @@ public class CommandParser {
         String userName = command.substring(0, command.indexOf(":")).trim();
         tokenList.add(userName.toLowerCase());
         command = command.substring(command.indexOf(":") + 1);
-        StringTokenizer tokenizer = new StringTokenizer(command, " ");
+        tokeniseString(command, tokenList);
+        return tokenList;
+    }
+
+    private static void tokeniseString(String string, LinkedList<String> tokenList) {
+        StringTokenizer tokenizer = new StringTokenizer(string, " ");
         while (tokenizer.hasMoreTokens()) {
             String rawToken = tokenizer.nextToken().toLowerCase();
-            tokenList.add(rawToken.trim().replaceAll("\\s+", " "));
+            tokenList.add(rawToken.trim().replaceAll("\\s+", ""));
         }
-        return tokenList;
     }
 
 
