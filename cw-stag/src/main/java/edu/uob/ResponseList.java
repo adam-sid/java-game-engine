@@ -93,4 +93,8 @@ public class ResponseList {
     public static String badHealthCommand() {
         return "I don't understand that command, maybe you meant 'health'?";
     }
+
+    public static String playerDeath() {
+        return "you died and lost all of your items, you have respawned at the start of the game";
+    }
 }

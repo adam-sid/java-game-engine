@@ -27,6 +27,11 @@ public class CommandParser {
         if (!gameState.getEntityMap("player").containsKey(playerName)) {
             gameState.addPlayer(playerName);
         }
+        Set<Integer> playerTokens = whichTokenPlayer(gameState, tokenList);
+        for (Integer playerToken : playerTokens) {
+            String taggedName = Utils.addPlayerTag(tokenList.get(playerToken));
+            tokenList.set(playerToken, taggedName);
+        }
         return CommandParser.parseAction(tokenList, gameState);
     }
 
@@ -102,11 +107,9 @@ public class CommandParser {
 
     private static Boolean canActionExecute(GameState gameState, LinkedList<String> tokenList,
                                             GameAction triggeredAction) {
+        LinkedList<String> bufferList = new LinkedList<>(tokenList.subList(1, tokenList.size()));
         PlayerEntity player = gameState.getPlayer(tokenList.get(0));
         Map<String, GameEntity> actionSubjects = triggeredAction.getSubjectEntities();
-        Map<String, GameEntity> extraneousSubjects = new HashMap<>(gameState.getEntityMap("all"));
-        extraneousSubjects.keySet().removeAll(actionSubjects.keySet());
-        extraneousSubjects.remove(player.getName());
         Map<String, GameEntity> subjectsInLocation = gameState.
                 getEntitiesFromLocation("all", player.getLocationName());
         Map<String, GameEntity> subjectsInInventory = player.getInventory();
@@ -117,7 +120,10 @@ public class CommandParser {
         //check at least one of the subjects needed for action is in command
         boolean subjectInString = actionSubjects.keySet().stream().anyMatch(tokenList::contains);
         //check if there are not any 'extraneous' subjects
-        boolean extraneousSubjectExists = extraneousSubjects.keySet().stream().anyMatch(tokenList::contains);
+        Map<String, GameEntity> extraneousSubjects = new HashMap<>(gameState.getEntityMap("all"));
+        extraneousSubjects.putAll(subjectsInInventory);
+        extraneousSubjects.keySet().removeAll(actionSubjects.keySet());
+        boolean extraneousSubjectExists = extraneousSubjects.keySet().stream().anyMatch(bufferList::contains);
         return subjectsAvailable && subjectInString && !extraneousSubjectExists;
     }
 
@@ -254,5 +260,21 @@ public class CommandParser {
             String rawToken = tokenizer.nextToken().toLowerCase();
             tokenList.add(rawToken.trim().replaceAll("\\s+", ""));
         }
+    }
+
+    private static Set<Integer> whichTokenPlayer(GameState gameState, LinkedList<String> tokenList) {
+        Set<Integer> playerIndices = new HashSet<>();
+        Map<String, GameEntity> players = gameState.getEntityMap("player");
+        Map<String, GameEntity> allEntitiesButPlayer = new HashMap<>(gameState.getEntityMap("all"));
+        allEntitiesButPlayer.keySet().removeAll(players.keySet());
+        List<String> playerNames = players.keySet().stream().toList();
+        LinkedList<String> bufferList = new LinkedList<>(tokenList);
+        for (int i = 0; i < bufferList.size(); i++) {
+            String token = Utils.addPlayerTag(bufferList.get(i));
+            if(playerNames.contains(token) && !allEntitiesButPlayer.containsKey(token)) {
+                playerIndices.add(i);
+            };
+        }
+        return playerIndices;
     }
 }

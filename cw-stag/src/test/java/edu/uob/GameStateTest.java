@@ -56,11 +56,5 @@ public class GameStateTest {
         assertEquals("cabin", cabin.getName());
     }
 
-    @Test
-    void testExtendedEntitiesFile() {
-        EntityFileParser parser = new EntityFileParser(entitiesFile);
-        GameState gameState = parser.getGameState();
-    }
-
 }
 

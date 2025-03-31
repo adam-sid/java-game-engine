@@ -26,6 +26,7 @@ public class PlayerEntity extends GameEntity{
         }
     }
 
+    //method modifies health and returns false if player has died
     public boolean modifyHealth(int changeInHealth) {
         if (changeInHealth >= 0) {
             this.health = Math.min(3, this.health + changeInHealth);
