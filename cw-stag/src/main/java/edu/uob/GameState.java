@@ -77,9 +77,10 @@ public class GameState {
         }
     }
 
-    public String getPlayerLocation(String playerName) {
+    public LocationEntity getPlayerLocation(String playerName) {
         if (this.players.containsKey(playerName)) {
-            return this.players.get(playerName).getLocationName();
+            String locationName = this.players.get(playerName).getLocationName();
+            return (LocationEntity) this.locations.get(locationName);
         } else {
             throw new RuntimeException(playerName);
         }

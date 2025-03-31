@@ -5,32 +5,52 @@ import edu.uob.GameEntity.LocationEntity;
 import edu.uob.GameEntity.PlayerEntity;
 import edu.uob.GameState;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class LookCommand {
 
     public static String execute(GameState gameState, String playerName) {
-        StringBuilder builder = new StringBuilder();
-        PlayerEntity currentPlayer =  (PlayerEntity) gameState.getEntityMap("player").get(playerName);
-        String locationName = currentPlayer.getLocationName();
-        LocationEntity playerLocation = (LocationEntity) gameState.getEntityMap("location")
-                .get(locationName);
-        Map<String, GameEntity> visibleEntities = gameState.getEntitiesFromLocation("all", locationName);
+        StringBuilder messageBuilder = new StringBuilder();
+        PlayerEntity currentPlayer = gameState.getPlayer(playerName);
+        LocationEntity playerLocation = gameState.getPlayerLocation(playerName);
+        String locationName = playerLocation.getName();
+
+        messageBuilder.append("You are in ");
+        messageBuilder.append(playerLocation.getDescription());
+        messageBuilder.append("You can see ");
+        Map<String, GameEntity> visibleEntities = new HashMap<>(gameState
+                .getEntitiesFromLocation("all", locationName));
+        visibleEntities.remove(locationName);
+        visibleEntities.remove(playerName);
+        
         for (GameEntity visibleEntity : visibleEntities.values()) {
-            if (visibleEntity != currentPlayer) {
-                if (!builder.isEmpty()) {
-                    builder.append("\n");
-                }
-                builder.append(visibleEntity.getDescription());
-            }
+            messageBuilder.append("\n");
+            messageBuilder.append(visibleEntity.getDescription());
         }
+
+        LookCommand.addPaths(messageBuilder, gameState, locationName);
+
         Map<String, LocationEntity> pathsFromLocation = playerLocation.getPaths();
+        boolean firstPass = true;
         for (String pathName : pathsFromLocation.keySet() ) {
-            if (!builder.isEmpty()) {
-                builder.append("\n");
+            if (firstPass) {
+                firstPass = false;
+                messageBuilder.append("\nYou can also go to:");
             }
-            builder.append(pathName);
+            if (!messageBuilder.isEmpty()) {
+                messageBuilder.append("\n");
+            }
+            messageBuilder.append(pathName);
         }
-        return builder.toString();
+        return messageBuilder.toString();
     }
+
+    private static void addPaths(StringBuilder messageBuilder, GameState gameState, String locationName) {
+        messageBuilder.append("\nYou also see paths to the following locations:");
+    }
+
+
 }
+
+

@@ -1,5 +1,7 @@
 package edu.uob.GameEntity;
 
+import edu.uob.Utils;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,7 +18,8 @@ public class PlayerEntity extends GameEntity{
 
     private void setPlayerDescription() {
         StringBuilder buildDescription = new StringBuilder();
-        buildDescription.append("a player called ").append(this.name);
+        buildDescription.append("a player called ")
+                .append(Utils.removePlayerTag(this.name));
         this.description = buildDescription.toString();
     }
 

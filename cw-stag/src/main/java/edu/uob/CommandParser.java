@@ -178,7 +178,7 @@ public class CommandParser {
             return ResponseList.badGoToCommand();
         }
         String targetLocation = CommandParser.getSubjectName("goto", tokenList);
-        String playerLocationName =  gameState.getPlayerLocation(tokenList.get(0));
+        String playerLocationName =  gameState.getPlayerLocation(tokenList.get(0)).getLocationName();
         LocationEntity playerLocation = (LocationEntity) gameState.getEntityMap("location")
                 .get(playerLocationName);
         Map <String, LocationEntity> visiblePaths = playerLocation.getPaths();
@@ -208,7 +208,7 @@ public class CommandParser {
             return ResponseList.badGetCommand();
         }
         String itemToGet = CommandParser.getSubjectName("get", tokenList);
-        String playerLocation =  gameState.getPlayerLocation(tokenList.get(0));
+        String playerLocation =  gameState.getPlayerLocation(tokenList.get(0)).getLocationName();
         String itemType = gameState.getEntityTypeFromName(itemToGet);
         Map<String, GameEntity> nearbyEntities = gameState.getEntitiesFromLocation("all", playerLocation);
         if (nearbyEntities.containsKey(itemToGet)) {
