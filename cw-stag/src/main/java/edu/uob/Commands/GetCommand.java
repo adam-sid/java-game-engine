@@ -1,6 +1,5 @@
 package edu.uob.Commands;
 
-import edu.uob.GameEntity.GameEntity;
 import edu.uob.GameState;
 
 public class GetCommand {

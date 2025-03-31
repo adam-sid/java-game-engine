@@ -1,9 +1,7 @@
 package edu.uob.Commands;
 
-import edu.uob.GameEntity.GameEntity;
 import edu.uob.GameEntity.PlayerEntity;
 import edu.uob.GameState;
-import java.util.Map;
 
 public class GoToCommand {
 

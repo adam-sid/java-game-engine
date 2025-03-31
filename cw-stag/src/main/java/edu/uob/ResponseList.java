@@ -1,11 +1,6 @@
 package edu.uob;
 
 public class ResponseList {
-    String response;
-
-    public static String tooManyActions() {
-        return "Invalid command";
-    }
 
     public static String noActionFound() {
         return "No action found";
@@ -80,10 +75,6 @@ public class ResponseList {
 
     public static String pathDoesNotExist() {
         return "You cannot see a path to that location";
-    }
-
-    public static String multipleActionFound() {
-        return "Multiple actions found";
     }
 
     public static String ambiguousCommand() {

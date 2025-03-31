@@ -115,8 +115,8 @@ public class GameState {
             LocationEntity targetLocation = (LocationEntity) locations.get(targetLocationName);
             targetLocation.removePath(entityName);
         } else if (playerInventory.containsKey(entityName)) {
-            moveFromInventory(player.getName(), entityName);
-            moveEntity("storeroom", entityName);
+            this.moveFromInventory(player.getName(), entityName);
+            this.moveEntity("storeroom", entityName);
         } else {
             this.moveEntity("storeroom", entityName);
         }
@@ -133,7 +133,7 @@ public class GameState {
             LocationEntity producedPath = (LocationEntity) locations.get(entityName);
             targetLocation.addPath(producedPath);
         } else if (playerInventory.containsKey(entityName)) {
-            moveFromInventory(player.getName(), entityName);
+            this.moveFromInventory(player.getName(), entityName);
         } else {
             this.moveEntity(targetLocationName, entityName);
         }
@@ -166,7 +166,7 @@ public class GameState {
     public void resetPlayer(PlayerEntity player) {
         Map<String, GameEntity> playerInventory = player.getInventory();
         for (String entityName : playerInventory.keySet()) {
-            moveFromInventory(player.getName(), entityName);
+            this.moveFromInventory(player.getName(), entityName);
         }
         player.setLocationName(this.startLocationName);
         player.modifyHealth(3);

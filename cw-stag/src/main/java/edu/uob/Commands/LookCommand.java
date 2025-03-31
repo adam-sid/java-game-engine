@@ -5,7 +5,6 @@ import edu.uob.GameEntity.LocationEntity;
 import edu.uob.GameEntity.PlayerEntity;
 import edu.uob.GameState;
 
-import java.io.File;
 import java.util.Map;
 
 public class LookCommand {
@@ -31,7 +30,6 @@ public class LookCommand {
             }
             builder.append(pathName);
         }
-        String path = LookCommand.class.getProtectionDomain().getCodeSource().getLocation().getPath();
         return builder.toString();
     }
 }

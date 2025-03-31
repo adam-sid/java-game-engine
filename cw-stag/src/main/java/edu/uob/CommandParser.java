@@ -27,7 +27,7 @@ public class CommandParser {
         if (!gameState.getEntityMap("player").containsKey(playerName)) {
             gameState.addPlayer(playerName);
         }
-        Set<Integer> playerTokens = whichTokenPlayer(gameState, tokenList);
+        Set<Integer> playerTokens = CommandParser.whichTokenPlayer(gameState, tokenList);
         for (Integer playerToken : playerTokens) {
             String taggedName = Utils.addPlayerTag(tokenList.get(playerToken));
             tokenList.set(playerToken, taggedName);
@@ -75,9 +75,9 @@ public class CommandParser {
                     }
                 }
             } else {
-                tokeniseString(triggerPhrase, triggerTokens);
-                if (commandContainsTrigger(tokenList, triggerTokens)) {
-                    if(canActionExecute(gameState, tokenList, actionEntry.getValue())) {
+                CommandParser.tokeniseString(triggerPhrase, triggerTokens);
+                if (CommandParser.commandContainsTrigger(tokenList, triggerTokens)) {
+                    if(CommandParser.canActionExecute(gameState, tokenList, actionEntry.getValue())) {
                         executableActionMap.put(triggerPhrase, actionEntry.getValue());
                     }
                 }
@@ -166,7 +166,7 @@ public class CommandParser {
         if (!(tokenList.contains("goto") && tokenList.size() == 3)) {
             return ResponseList.badGoToCommand();
         }
-        String targetLocation = getSubjectName("goto", tokenList);
+        String targetLocation = CommandParser.getSubjectName("goto", tokenList);
         String playerLocationName =  gameState.getPlayerLocation(tokenList.get(0));
         LocationEntity playerLocation = (LocationEntity) gameState.getEntityMap("location")
                 .get(playerLocationName);
@@ -182,7 +182,7 @@ public class CommandParser {
         if (!(tokenList.contains("drop") && tokenList.size() == 3)) {
             return ResponseList.badDropCommand();
         }
-        String itemToDrop = getSubjectName("drop", tokenList);
+        String itemToDrop = CommandParser.getSubjectName("drop", tokenList);
         PlayerEntity currentPlayer = (PlayerEntity) gameState.getEntityMap("player").get(tokenList.get(0));
         Map<String, GameEntity> playerInventory = currentPlayer.getInventory();
         if (playerInventory.containsKey(itemToDrop)) {
@@ -196,12 +196,12 @@ public class CommandParser {
         if (!(tokenList.contains("get") && tokenList.size() == 3)) {
             return ResponseList.badGetCommand();
         }
-        String itemToGet = getSubjectName("get", tokenList);
+        String itemToGet = CommandParser.getSubjectName("get", tokenList);
         String playerLocation =  gameState.getPlayerLocation(tokenList.get(0));
         String itemType = gameState.getEntityTypeFromName(itemToGet);
         Map<String, GameEntity> nearbyEntities = gameState.getEntitiesFromLocation("all", playerLocation);
         if (nearbyEntities.containsKey(itemToGet)) {
-            return parseGetResponse(tokenList, gameState, itemType, itemToGet);
+            return CommandParser.parseGetResponse(tokenList, gameState, itemType, itemToGet);
         } else {
             return ResponseList.itemCannotBeFound(itemToGet);
         }
@@ -250,7 +250,7 @@ public class CommandParser {
         String userName = command.substring(0, command.indexOf(":")).trim();
         tokenList.add(userName.toLowerCase());
         command = command.substring(command.indexOf(":") + 1);
-        tokeniseString(command, tokenList);
+        CommandParser.tokeniseString(command, tokenList);
         return tokenList;
     }
 
@@ -273,7 +273,7 @@ public class CommandParser {
             String token = Utils.addPlayerTag(bufferList.get(i));
             if(playerNames.contains(token) && !allEntitiesButPlayer.containsKey(token)) {
                 playerIndices.add(i);
-            };
+            }
         }
         return playerIndices;
     }

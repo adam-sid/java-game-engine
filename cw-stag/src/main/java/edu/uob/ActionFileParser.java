@@ -73,7 +73,7 @@ public class ActionFileParser {
             Map<String, GameEntity> producedEntities = lookUpEntities(gameState, produced);
             Map<String, GameEntity> consumedEntities = lookUpEntities(gameState, consumed);
             GameAction gameAction = new GameAction(subjectEntities, consumedEntities, producedEntities, narration);
-            setChangeInHealth(gameAction, produced, consumed);
+            ActionFileParser.setChangeInHealth(gameAction, produced, consumed);
             for (String trigger: triggers) {
                 gameState.addGameAction(trigger, gameAction);
             }

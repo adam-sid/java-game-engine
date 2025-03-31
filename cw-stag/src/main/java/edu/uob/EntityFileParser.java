@@ -26,11 +26,11 @@ public class EntityFileParser {
 
     public EntityFileParser(File file) {
         this.file = file;
-        this.locations = new HashMap<String, GameEntity>();
+        this.locations = new HashMap<>();
         this.startLocationName = null;
-        this.furniture = new HashMap<String, GameEntity>();
-        this.artefacts = new HashMap<String, GameEntity>();
-        this.characters = new HashMap<String, GameEntity>();
+        this.furniture = new HashMap<>();
+        this.artefacts = new HashMap<>();
+        this.characters = new HashMap<>();
         this.parseEntityFile();
         this.gameState = new GameState(this.locations, this.startLocationName,
                 this.furniture, this.artefacts, this.characters);
