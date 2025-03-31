@@ -115,21 +115,25 @@ public class GameState {
             LocationEntity targetLocation = (LocationEntity) locations.get(targetLocationName);
             targetLocation.removePath(entityName);
         } else if (playerInventory.containsKey(entityName)) {
-            playerInventory.remove(entityName);
+            moveFromInventory(player.getName(), entityName);
+            moveEntity("storeroom", entityName);
         } else {
             this.moveEntity("storeroom", entityName);
         }
     }
 
     //TODO exceptions may not be worth having - impossible to be thrown?
-    public void produceEntity(String targetLocationName, String entityName) {
-        if (!allEntities.containsKey(entityName)) {
+    public void produceEntity(String targetLocationName, String entityName, PlayerEntity player) {
+        Map<String, GameEntity> playerInventory = player.getInventory();
+        if (!(allEntities.containsKey(entityName) || playerInventory.containsKey(entityName))) {
             throw new IllegalArgumentException(entityName);
         }
         if (locations.containsKey(entityName)) {
             LocationEntity targetLocation = (LocationEntity) locations.get(targetLocationName);
             LocationEntity producedPath = (LocationEntity) locations.get(entityName);
             targetLocation.addPath(producedPath);
+        } else if (playerInventory.containsKey(entityName)) {
+            moveFromInventory(player.getName(), entityName);
         } else {
             this.moveEntity(targetLocationName, entityName);
         }

@@ -22,7 +22,7 @@ public class CustomCommand {
         }
         Map<String, GameEntity> producedEntities = action.getProducedEntities();
         for (String entityName : producedEntities.keySet()) {
-            gameState.produceEntity(playerLocation, entityName);
+            gameState.produceEntity(playerLocation, entityName, player);
         }
         return action.getNarration();
     }

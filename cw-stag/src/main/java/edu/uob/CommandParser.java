@@ -102,20 +102,23 @@ public class CommandParser {
 
     private static Boolean canActionExecute(GameState gameState, LinkedList<String> tokenList,
                                             GameAction triggeredAction) {
-        Map<String, GameEntity> actionSubjects = triggeredAction.getSubjectEntities();
         PlayerEntity player = gameState.getPlayer(tokenList.get(0));
+        Map<String, GameEntity> actionSubjects = triggeredAction.getSubjectEntities();
+        Map<String, GameEntity> extraneousSubjects = new HashMap<>(gameState.getEntityMap("all"));
+        extraneousSubjects.keySet().removeAll(actionSubjects.keySet());
+        extraneousSubjects.remove(player.getName());
         Map<String, GameEntity> subjectsInLocation = gameState.
                 getEntitiesFromLocation("all", player.getLocationName());
         Map<String, GameEntity> subjectsInInventory = player.getInventory();
         Map<String, GameEntity> availableSubjects = new HashMap<>(subjectsInLocation);
         availableSubjects.putAll(subjectsInInventory);
+        //check that all prerequisite subjects are available
         boolean subjectsAvailable = availableSubjects.keySet().containsAll(actionSubjects.keySet());
+        //check at least one of the subjects needed for action is in command
         boolean subjectInString = actionSubjects.keySet().stream().anyMatch(tokenList::contains);
-        if (subjectsAvailable && subjectInString) {
-            return true;
-        } else {
-            return false;
-        }
+        //check if there are not any 'extraneous' subjects
+        boolean extraneousSubjectExists = extraneousSubjects.keySet().stream().anyMatch(tokenList::contains);
+        return subjectsAvailable && subjectInString && !extraneousSubjectExists;
     }
 
     private static String parseBasicAction(LinkedList<String> tokenList, GameState gameState, String basicAction) {
