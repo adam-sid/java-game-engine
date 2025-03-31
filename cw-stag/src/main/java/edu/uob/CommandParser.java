@@ -7,6 +7,7 @@ import edu.uob.GameEntity.LocationEntity;
 import edu.uob.GameEntity.PlayerEntity;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class CommandParser {
 
@@ -21,7 +22,7 @@ public class CommandParser {
         } else if (tokenList.size() < 2) {
             return ResponseList.noCommand(tokenList.get(0));
         }
-        //add '(Player)' to end of playerName to avoid possibility of clash with other entity names
+        //add '(Player)' to end of playerName to avoid possibility of clash with entity
         String playerName = Utils.addPlayerTag(tokenList.get(0));
         tokenList.set(0, playerName);
         if (!gameState.getEntityMap("player").containsKey(playerName)) {
@@ -46,43 +47,55 @@ public class CommandParser {
             int actionIndex = tokenList.indexOf(action);
             return CommandParser.parseBasicAction(tokenList, gameState, tokenList.get(actionIndex));
         } else if (basicActionCount == 0) {
-            Map <String, GameAction> executableActionMap = parseCustomAction(tokenList, gameState);
-            boolean actionsAreSame = executableActionMap.values().stream().distinct().count() == 1;
-            if (executableActionMap.size() == 1 || (executableActionMap.size() > 1 && actionsAreSame)) {
-                String trigger = executableActionMap.keySet().iterator().next();
-                GameAction triggeredAction = gameState.getGameActions().get(trigger);
+            Map <String, List<GameAction>> executableActionMap = parseCustomAction(tokenList, gameState);
+            List<GameAction> executableActionList = executableActionMap.values().stream().toList()
+                    .stream().flatMap(List :: stream).toList();
+            boolean actionsAreSame = executableActionList.stream().distinct().count() == 1;
+            if (actionsAreSame) {
+                GameAction triggeredAction = executableActionList.get(0);
                 return CustomCommand.execute(gameState, triggeredAction, tokenList.get(0));
-            } else if (!executableActionMap.isEmpty()) {
+            } else if (!executableActionList.isEmpty()) {
                 return ResponseList.ambiguousCommand();
             }
         }
         return ResponseList.noActionFound();
     }
 
-    private static Map <String, GameAction> parseCustomAction(LinkedList<String> tokenList, GameState gameState) {
-        Map<String, GameAction> customActionMap = gameState.getGameActions();
-        Map <String, GameAction> executableActionMap = new HashMap<>();
-        for (Map.Entry<String, GameAction> actionEntry : customActionMap.entrySet()) {
+    private static Map<String, List<GameAction>> parseCustomAction(LinkedList<String> tokenList, GameState gameState) {
+        Map<String, List<GameAction>> customActionMap = gameState.getGameActions();
+        Map <String, List<GameAction>> executableActionMap = new HashMap<>();
+        for (Map.Entry<String, List<GameAction>> actionEntry : customActionMap.entrySet()) {
             String triggerPhrase = actionEntry.getKey();
             LinkedList<String> triggerTokens = new LinkedList<>();
             if (!triggerPhrase.contains(" ")) {
                 if (tokenList.contains(triggerPhrase)) {
                     triggerTokens.add(triggerPhrase);
-                    if(canActionExecute(gameState, tokenList, actionEntry.getValue())) {
-                        executableActionMap.put(triggerPhrase, actionEntry.getValue());
-                    }
+                    List<GameAction> validActions = CommandParser
+                            .parseActionList(gameState, tokenList, actionEntry.getValue());
+                    executableActionMap.put(triggerPhrase, validActions);
                 }
             } else {
                 CommandParser.tokeniseString(triggerPhrase, triggerTokens);
                 if (CommandParser.commandContainsTrigger(tokenList, triggerTokens)) {
-                    if(CommandParser.canActionExecute(gameState, tokenList, actionEntry.getValue())) {
-                        executableActionMap.put(triggerPhrase, actionEntry.getValue());
-                    }
+                    triggerTokens.add(triggerPhrase);
+                    List<GameAction> validActions = CommandParser
+                            .parseActionList(gameState, tokenList, actionEntry.getValue());
+                    executableActionMap.put(triggerPhrase, validActions);
                 }
             }
-
         }
         return executableActionMap;
+    }
+
+    private static List<GameAction> parseActionList(GameState gameState, LinkedList<String> tokenList,
+                                                    List<GameAction> possibleActions) {
+        List<GameAction> validActionList = new LinkedList<>();
+        for (GameAction action : possibleActions) {
+            if(canActionExecute(gameState, tokenList, action)) {
+                validActionList.add(action);
+            }
+        }
+        return validActionList;
     }
 
     private static boolean commandContainsTrigger(LinkedList<String> tokenList, LinkedList<String> triggerTokens) {
@@ -223,7 +236,7 @@ public class CommandParser {
             case "furniture":
                 return ResponseList.pickUpFurniture(itemToGet);
             case "player", "character":
-                if (Utils.removePlayerTag(tokenList.get(0)).equals(itemToGet)) {
+                if (tokenList.get(0).equals(itemToGet)) {
                     return ResponseList.pickUpYourself();
                 }
                 return ResponseList.pickUpPlayer(itemToGet);

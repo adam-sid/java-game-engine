@@ -13,7 +13,8 @@ public class LookCommand {
         StringBuilder builder = new StringBuilder();
         PlayerEntity currentPlayer =  (PlayerEntity) gameState.getEntityMap("player").get(playerName);
         String locationName = currentPlayer.getLocationName();
-        LocationEntity playerLocation = (LocationEntity) gameState.getEntityMap("location").get(locationName);
+        LocationEntity playerLocation = (LocationEntity) gameState.getEntityMap("location")
+                .get(locationName);
         Map<String, GameEntity> visibleEntities = gameState.getEntitiesFromLocation("all", locationName);
         for (GameEntity visibleEntity : visibleEntities.values()) {
             if (visibleEntity != currentPlayer) {

@@ -5,8 +5,7 @@ import edu.uob.GameAction.GameAction;
 import edu.uob.GameEntity.LocationEntity;
 import edu.uob.GameEntity.PlayerEntity;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class GameState {
 
@@ -17,7 +16,7 @@ public class GameState {
     private final Map<String, GameEntity> characters;
     private final Map<String, GameEntity> players = new HashMap<>();
     private final Map<String, GameEntity> allEntities = new HashMap<>();
-    private final Map<String, GameAction> gameActions = new HashMap<>();
+    private final Map<String, List<GameAction>> gameActions = new HashMap<>();
 
     public GameState(Map<String, GameEntity> locations, String startLocationName, Map<String, GameEntity> furniture,
                      Map<String, GameEntity> artefacts, Map<String, GameEntity> characters) {
@@ -94,12 +93,18 @@ public class GameState {
         }
     }
 
-    public Map<String, GameAction> getGameActions() {
+    public Map<String, List<GameAction>> getGameActions() {
         return gameActions;
     }
 
     public void addGameAction(String triggerName, GameAction gameAction) {
-        this.gameActions.put(triggerName, gameAction);
+        if(!this.gameActions.containsKey(triggerName)) {
+            List<GameAction> newAction = new LinkedList<>();
+            newAction.add(gameAction);
+            this.gameActions.put(triggerName, newAction);
+        } else {
+            this.gameActions.get(triggerName).add(gameAction);
+        }
     }
 
     public void consumeEntity(String targetLocationName, String entityName, PlayerEntity player) {

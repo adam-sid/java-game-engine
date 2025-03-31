@@ -17,9 +17,9 @@ public final class GameServer {
 
     public static void main(String[] args) throws IOException {
         StringBuilder configFolderPath = new StringBuilder("config").append(File.separator);
-        File entitiesFile = Paths.get(configFolderPath.toString(), "extended-entities.dot" )
+        File entitiesFile = Paths.get(configFolderPath.toString(), "semi-ambiguous-entities.dot" )
                 .toAbsolutePath().toFile();
-        File actionsFile = Paths.get(configFolderPath.toString(), "extended-actions.xml" )
+        File actionsFile = Paths.get(configFolderPath.toString(), "ambiguous-actions-whitespace.xml" )
                 .toAbsolutePath().toFile();
         GameServer server = new GameServer(entitiesFile, actionsFile);
         server.blockingListenOn(8888);
