@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class GameState {
-    //TODO would using a List to store these be simpler?
+
     private final Map<String, GameEntity> locations;
     private final String startLocationName;
     private final Map<String, GameEntity> furniture;
@@ -18,10 +18,6 @@ public class GameState {
     private final Map<String, GameEntity> players = new HashMap<>();
     private final Map<String, GameEntity> allEntities = new HashMap<>();
     private final Map<String, GameAction> gameActions = new HashMap<>();
-
-
-    //TODO: add multiplayer function, add execute command method that takes a player as argument and a command (will need
-    //TODO-cont: parse command, person needs inventory, health and location. Make inventory a hashmap name of entity and entity
 
     public GameState(Map<String, GameEntity> locations, String startLocationName, Map<String, GameEntity> furniture,
                      Map<String, GameEntity> artefacts, Map<String, GameEntity> characters) {
@@ -122,7 +118,6 @@ public class GameState {
         }
     }
 
-    //TODO exceptions may not be worth having - impossible to be thrown?
     public void produceEntity(String targetLocationName, String entityName, PlayerEntity player) {
         Map<String, GameEntity> playerInventory = player.getInventory();
         if (!(allEntities.containsKey(entityName) || playerInventory.containsKey(entityName))) {
@@ -138,7 +133,7 @@ public class GameState {
             this.moveEntity(targetLocationName, entityName);
         }
     }
-    //TODO exceptions may not be worth having - impossible to be thrown?
+
     public void moveEntity(String toLocation, String entityName) {
         if (!allEntities.containsKey(entityName)) {
             throw new IllegalArgumentException(entityName);

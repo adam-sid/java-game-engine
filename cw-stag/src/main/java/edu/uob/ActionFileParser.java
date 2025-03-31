@@ -30,7 +30,6 @@ public class ActionFileParser {
             throw new RuntimeException(e);
         }
     }
-    //TODO shorten this method
     //creates GameAction objects from the XML file and adds to game state
     private static void extractActions(GameState gameState, NodeList actions) {
         for (int actionIndex = 1; actionIndex < actions.getLength(); actionIndex+=2) {
@@ -40,35 +39,7 @@ public class ActionFileParser {
             List<String> subjects = new LinkedList<>();
             List<String> produced = new LinkedList<>();
             List<String> consumed = new LinkedList<>();
-            String narration = null;
-            for (int actionChildrenIndex = 0; actionChildrenIndex < actionChildren.getLength(); actionChildrenIndex++) {
-                Node actionChild = actionChildren.item(actionChildrenIndex);
-                String type = actionChild.getNodeName().toLowerCase();
-                switch (type) {
-                    case "triggers": {
-                        triggers.addAll(extractLeafContent(actionChild));
-                        break;
-                    }
-                    case "subjects": {
-                        subjects.addAll(extractLeafContent(actionChild));
-                        break;
-                    }
-                    case "produced": {
-                        produced.addAll(extractLeafContent(actionChild));
-                        break;
-                    }
-                    case "consumed": {
-                        consumed.addAll(extractLeafContent(actionChild));
-                        break;
-                    }
-                    case "narration": {
-                        narration = actionChild.getTextContent().toLowerCase();
-                        break;
-                    }
-                    default:
-                        break;
-                }
-            }
+            String narration = extractActionProperties(actionChildren, triggers, subjects, produced, consumed);
             Map<String, GameEntity> subjectEntities = lookUpEntities(gameState, subjects);
             Map<String, GameEntity> producedEntities = lookUpEntities(gameState, produced);
             Map<String, GameEntity> consumedEntities = lookUpEntities(gameState, consumed);
@@ -78,6 +49,40 @@ public class ActionFileParser {
                 gameState.addGameAction(trigger, gameAction);
             }
         }
+    }
+
+    private static String extractActionProperties(NodeList actionChildren, Set<String> triggers,
+                                              List<String> subjects, List<String> produced, List<String> consumed) {
+        String narration = null;
+        for (int actionChildrenIndex = 0; actionChildrenIndex < actionChildren.getLength(); actionChildrenIndex++) {
+            Node actionChild = actionChildren.item(actionChildrenIndex);
+            String type = actionChild.getNodeName().toLowerCase();
+            switch (type) {
+                case "triggers": {
+                    triggers.addAll(extractLeafContent(actionChild));
+                    break;
+                }
+                case "subjects": {
+                    subjects.addAll(extractLeafContent(actionChild));
+                    break;
+                }
+                case "produced": {
+                    produced.addAll(extractLeafContent(actionChild));
+                    break;
+                }
+                case "consumed": {
+                    consumed.addAll(extractLeafContent(actionChild));
+                    break;
+                }
+                case "narration": {
+                    narration = actionChild.getTextContent().toLowerCase();
+                    break;
+                }
+                default:
+                    break;
+            }
+        }
+        return narration;
     }
 
     private static void setChangeInHealth(GameAction gameAction, List<String> produced, List<String> consumed) {

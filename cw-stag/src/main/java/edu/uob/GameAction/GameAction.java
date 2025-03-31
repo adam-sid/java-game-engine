@@ -6,7 +6,6 @@ import java.util.Map;
 
 public class GameAction
 {
-    //TODO the trigger word should be stored as the key in a HashMap that pairs with a CustomAction
     private final Map<String, GameEntity> subjectEntities;
     private final Map<String, GameEntity> consumedEntities;
     private final Map<String, GameEntity> producedEntities;

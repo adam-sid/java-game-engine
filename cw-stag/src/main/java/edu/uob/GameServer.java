@@ -15,8 +15,6 @@ public final class GameServer {
     private static final char END_OF_TRANSMISSION = 4;
     private final GameState gameState;
 
-    //todo make this work on any file not just basic ones
-    //what is the point of this function?
     public static void main(String[] args) throws IOException {
         StringBuilder configFolderPath = new StringBuilder("config").append(File.separator);
         File entitiesFile = Paths.get(configFolderPath.toString(), "extended-entities.dot" )
@@ -34,7 +32,7 @@ public final class GameServer {
     * @param entitiesFile The game configuration file containing all game entities to use in your game
     * @param actionsFile The game configuration file containing all game actions to use in your game
     */
-    // TODO implement server logic here
+
     public GameServer(File entitiesFile, File actionsFile) {
         EntityFileParser stateParser = new EntityFileParser(entitiesFile);
         this.gameState = stateParser.getGameState();
@@ -47,7 +45,7 @@ public final class GameServer {
     *
     * @param command The incoming command to be processed
     */
-    // TODO implement your server logic here
+
     public String handleCommand(String command) {
         return CommandParser.parseCommand(command, this.gameState);
     }

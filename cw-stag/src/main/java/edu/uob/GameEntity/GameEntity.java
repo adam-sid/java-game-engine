@@ -3,7 +3,7 @@ package edu.uob.GameEntity;
 public class GameEntity
 {
     protected final String name;
-    protected final String description;
+    protected String description;
     protected String locationName;
 
     public GameEntity(String name, String description, String locationName)

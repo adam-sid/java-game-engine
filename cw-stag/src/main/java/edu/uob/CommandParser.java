@@ -59,8 +59,6 @@ public class CommandParser {
         return ResponseList.noActionFound();
     }
 
-    //TODO work on rejecting extraneous subjects
-
     private static Map <String, GameAction> parseCustomAction(LinkedList<String> tokenList, GameState gameState) {
         Map<String, GameAction> customActionMap = gameState.getGameActions();
         Map <String, GameAction> executableActionMap = new HashMap<>();

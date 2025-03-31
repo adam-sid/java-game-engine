@@ -13,7 +13,6 @@ import com.alexmerz.graphviz.objects.Edge;
 import edu.uob.GameEntity.GameEntity;
 import edu.uob.GameEntity.LocationEntity;
 
-//TODO is it redundant to have gameState and parser hold like information
 public class EntityFileParser {
 
     private final File file;

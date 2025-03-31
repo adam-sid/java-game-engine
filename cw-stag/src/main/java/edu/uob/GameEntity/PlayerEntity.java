@@ -8,14 +8,16 @@ public class PlayerEntity extends GameEntity{
     private int health;
     private final Map<String, GameEntity> inventory = new HashMap<>();
 
-    //player entities are not assigned a description: TODO lets make a random player description generator
     public PlayerEntity(String name, String locationName) {
-        super(name, "a player", locationName);
+        super(name, "", locationName);
+        this.setPlayerDescription();
         this.health = 3;
     }
-    //TODO get this working to remake player description after construction
-    private static String playerDescriptor() {
-        return "Player";
+
+    private void setPlayerDescription() {
+        StringBuilder buildDescription = new StringBuilder();
+        buildDescription.append("a player called ").append(this.name);
+        this.description = buildDescription.toString();
     }
 
     @Override
