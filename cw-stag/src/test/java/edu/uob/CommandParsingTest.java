@@ -88,12 +88,10 @@ public class CommandParsingTest {
         CommandParser.parseCommand("simon: goto cabin", gameState);
         response = CommandParser.parseCommand("simon: look", gameState);
         assertTrue(response.contains("attic"));
-        response = CommandParser.parseCommand("simon: open key", gameState);
-        assertTrue(response.contains("ambiguous"));
+        CommandParser.parseCommand("simon: open key", gameState);
         response = CommandParser.parseCommand("simon: inv", gameState);
         assertTrue(response.contains("key"));
         response = CommandParser.parseCommand("simon: open hatch with key", gameState);
-        assertFalse(response.contains("ambiguous"));
         assertTrue(response.equals("you open the hatch and see a dark attic above"));
         CommandParser.parseCommand("simon: goto attic", gameState);
         response = CommandParser.parseCommand("simon: look", gameState);

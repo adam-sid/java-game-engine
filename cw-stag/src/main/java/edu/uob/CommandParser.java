@@ -106,7 +106,7 @@ public class CommandParser {
         for (String token : tokenList) {
             if (token.equals(triggerTokens.get(triggerIndex))) {
                 triggerIndex++;
-                if (triggerIndex == triggerTokens.size() - 1) {
+                if (triggerIndex == triggerTokens.size()) {
                     return true;
                 }
             } else {
@@ -185,6 +185,9 @@ public class CommandParser {
         if (visiblePaths.containsKey(targetLocation)) {
             return GoToCommand.execute(gameState, tokenList.get(0), targetLocation);
         } else {
+            if (Objects.equals(playerLocationName, targetLocation)) {
+                return ResponseList.alreadyAtLocation();
+            }
             return ResponseList.pathDoesNotExist();
         }
     }
@@ -246,7 +249,7 @@ public class CommandParser {
     }
 
     private static String parseInventory(LinkedList<String> tokenList, GameState gameState) {
-        if (tokenList.get(1).equals("inventory") || tokenList.get(1).equals("inv")) {
+        if ((tokenList.get(1).equals("inventory") || tokenList.get(1).equals("inv")) && tokenList.size() == 2) {
             return InventoryCommand.execute(gameState, tokenList.get(0));
         } else {
             return ResponseList.badInvCommand();

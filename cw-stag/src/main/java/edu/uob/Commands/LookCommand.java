@@ -15,42 +15,30 @@ public class LookCommand {
         PlayerEntity currentPlayer = gameState.getPlayer(playerName);
         LocationEntity playerLocation = gameState.getPlayerLocation(playerName);
         String locationName = playerLocation.getName();
-
         messageBuilder.append("You are in ");
         messageBuilder.append(playerLocation.getDescription());
-        messageBuilder.append("You can see ");
+        messageBuilder.append("\nYou can see:");
         Map<String, GameEntity> visibleEntities = new HashMap<>(gameState
                 .getEntitiesFromLocation("all", locationName));
         visibleEntities.remove(locationName);
         visibleEntities.remove(playerName);
-        
         for (GameEntity visibleEntity : visibleEntities.values()) {
             messageBuilder.append("\n");
             messageBuilder.append(visibleEntity.getDescription());
         }
-
-        LookCommand.addPaths(messageBuilder, gameState, locationName);
-
-        Map<String, LocationEntity> pathsFromLocation = playerLocation.getPaths();
-        boolean firstPass = true;
-        for (String pathName : pathsFromLocation.keySet() ) {
-            if (firstPass) {
-                firstPass = false;
-                messageBuilder.append("\nYou can also go to:");
-            }
-            if (!messageBuilder.isEmpty()) {
-                messageBuilder.append("\n");
-            }
-            messageBuilder.append(pathName);
-        }
+        LookCommand.addPaths(messageBuilder, gameState, playerLocation);
         return messageBuilder.toString();
     }
 
-    private static void addPaths(StringBuilder messageBuilder, GameState gameState, String locationName) {
-        messageBuilder.append("\nYou also see paths to the following locations:");
+    private static void addPaths(StringBuilder messageBuilder, GameState gameState,
+                                 LocationEntity playerLocation) {
+        HashMap<String, LocationEntity> availablePaths = playerLocation.getPaths();
+        messageBuilder.append("\nYou can also access the following locations:");
+        for (String path : availablePaths.keySet()) {
+            messageBuilder.append("\n");
+            messageBuilder.append(path);
+        }
     }
-
-
 }
 
 
