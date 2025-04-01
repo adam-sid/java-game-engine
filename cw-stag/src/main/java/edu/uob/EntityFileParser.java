@@ -65,6 +65,10 @@ public class EntityFileParser {
             List<Graph> features = location.getSubgraphs();
             this.parseEntities(features, locationName);
         }
+        if (!this.locations.containsKey("storeroom")) {
+            this.locations.put("storeroom",
+                    new LocationEntity("storeroom", "Storage for any entities not placed in the game"));
+        }
     }
 
     private void parseEntities(List<Graph> features, String locationName) {

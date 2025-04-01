@@ -92,4 +92,11 @@ public class ResponseList {
     public static String alreadyAtLocation() {
         return "You are already there";
     }
+
+    public static String badUserName(String userName) {
+        StringBuilder buildMessage = new StringBuilder();
+        buildMessage.append(userName)
+                .append(" is not a proper name");
+        return buildMessage.toString();
+    }
 }

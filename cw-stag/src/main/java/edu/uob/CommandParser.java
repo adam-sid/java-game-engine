@@ -7,12 +7,15 @@ import edu.uob.GameEntity.LocationEntity;
 import edu.uob.GameEntity.PlayerEntity;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class CommandParser {
 
     private static final Set<String> BASIC_ACTIONS = Set.of(
             "inventory", "inv", "get", "drop", "goto", "look", "health"
+    );
+
+    private static final Set<Character> VALID_CHARS = Set.of(
+            ' ', '\'', '-'
     );
 
     public static String parseCommand(String command, GameState gameState) {
@@ -23,6 +26,9 @@ public class CommandParser {
             return ResponseList.noCommand(tokenList.get(0));
         }
         //add '(Player)' to end of playerName to avoid possibility of clash with entity
+        if (CommandParser.invalidUserName(tokenList.get(0))) {
+            return ResponseList.badUserName(tokenList.get(0));
+        }
         String playerName = Utils.addPlayerTag(tokenList.get(0));
         tokenList.set(0, playerName);
         if (!gameState.getEntityMap("player").containsKey(playerName)) {
@@ -34,6 +40,15 @@ public class CommandParser {
             tokenList.set(playerToken, taggedName);
         }
         return CommandParser.parseAction(tokenList, gameState);
+    }
+
+    private static boolean invalidUserName(String userName) {
+        for (char stringChar : userName.toCharArray()) {
+            if (!(Character.isLetter(stringChar) || VALID_CHARS.contains(stringChar))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static String parseAction(LinkedList<String> tokenList, GameState gameState) {
@@ -116,6 +131,7 @@ public class CommandParser {
         return false;
     }
 
+    //TODO this doesnt work on multiple triggers - use debug to work out why
     private static Boolean canActionExecute(GameState gameState, LinkedList<String> tokenList,
                                             GameAction triggeredAction) {
         LinkedList<String> bufferList = new LinkedList<>(tokenList.subList(1, tokenList.size()));
@@ -259,9 +275,12 @@ public class CommandParser {
     private static LinkedList<String> tokeniseCommandString(String command) {
         LinkedList<String> tokenList = new LinkedList<>();
         if (!command.contains(":")) {
-            return tokenList;
+            return new LinkedList<>();
         }
         String userName = command.substring(0, command.indexOf(":")).trim();
+        if (userName.isEmpty()) {
+            return new LinkedList<>();
+        }
         tokenList.add(userName.toLowerCase());
         command = command.substring(command.indexOf(":") + 1);
         CommandParser.tokeniseString(command, tokenList);
@@ -278,14 +297,21 @@ public class CommandParser {
 
     private static Set<Integer> whichTokenPlayer(GameState gameState, LinkedList<String> tokenList) {
         Set<Integer> playerIndices = new HashSet<>();
+        Set<String> customActionTriggers = gameState.getGameActions().keySet();
         Map<String, GameEntity> players = gameState.getEntityMap("player");
         Map<String, GameEntity> allEntitiesButPlayer = new HashMap<>(gameState.getEntityMap("all"));
         allEntitiesButPlayer.keySet().removeAll(players.keySet());
         List<String> playerNames = players.keySet().stream().toList();
         LinkedList<String> bufferList = new LinkedList<>(tokenList);
         for (int i = 0; i < bufferList.size(); i++) {
-            String token = Utils.addPlayerTag(bufferList.get(i));
-            if(playerNames.contains(token) && !allEntitiesButPlayer.containsKey(token)) {
+            String tokenNoTag = (bufferList.get(i));
+            String tokenTag = Utils.addPlayerTag(bufferList.get(i));
+            boolean a = playerNames.contains(tokenTag);
+            boolean b = allEntitiesButPlayer.containsKey(tokenNoTag);
+            boolean c = BASIC_ACTIONS.contains(tokenNoTag);
+            boolean d = customActionTriggers.contains(tokenNoTag);
+            if(playerNames.contains(tokenTag) && !allEntitiesButPlayer.containsKey(tokenNoTag) &&
+                !BASIC_ACTIONS.contains(tokenNoTag) && !customActionTriggers.contains(tokenNoTag)) {
                 playerIndices.add(i);
             }
         }
