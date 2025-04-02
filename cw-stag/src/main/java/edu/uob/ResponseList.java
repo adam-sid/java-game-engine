@@ -49,7 +49,6 @@ public class ResponseList {
         return buildMessage.toString();
     }
 
-    //TODO this will never be activated as locations cannot be within other locations
     public static String pickUpImpossible() {
         return "Don't be silly...";
     }

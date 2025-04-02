@@ -1,4 +1,4 @@
-package edu.uob;
+package edu.uob.GameParsing;
 
 import java.io.IOException;
 import java.io.File;
@@ -10,6 +10,7 @@ import javax.xml.parsers.DocumentBuilder;
 
 import edu.uob.GameEntity.GameEntity;
 import edu.uob.GameAction.GameAction;
+import edu.uob.GameState;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 import org.w3c.dom.Document;

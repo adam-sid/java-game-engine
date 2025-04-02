@@ -1,15 +1,15 @@
 package edu.uob;
 
-import edu.uob.Commands.CustomCommand;
-import edu.uob.Commands.LookCommand;
+import edu.uob.GameCommands.CustomCommand;
+import edu.uob.GameCommands.LookCommand;
 import edu.uob.GameAction.GameAction;
 import edu.uob.GameEntity.GameEntity;
-import edu.uob.GameEntity.LocationEntity;
+import edu.uob.GameParsing.ActionFileParser;
+import edu.uob.GameParsing.CommandParser;
+import edu.uob.GameParsing.EntityFileParser;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
-import java.util.List;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -262,12 +262,111 @@ public class CommandParsingTest {
         EntityFileParser stateParser = new EntityFileParser(entitiesFile);
         GameState gameState = stateParser.getGameState();
         ActionFileParser.parseActionFile(actionsFile, gameState);
-       GameAction cut = gameState.getGameActions().get("cut").get(0);
+        GameAction cut = gameState.getGameActions().get("cut").get(0);
         assertTrue(gameState.getEntityMap("location").containsKey("storeroom"));
+        CommandParser.parseCommand("axe: look", gameState);
+        CommandParser.parseCommand("tree: look", gameState);
+        CommandParser.parseCommand("simon: get axe", gameState);
         CommandParser.parseCommand("simon: goto forest", gameState);
-        String response = CommandParser.parseCommand("simon: tree cut down and cut and chop down", gameState);
+        String response = CommandParser.parseCommand("simon: tree cut down and cut and chop down axe", gameState);
         assertEquals(CustomCommand.execute(gameState, cut, "simon(player)"), response);
+    }
+
+    @Test
+    void testMultipleTriggersAgain() {
+        File entitiesFile = new File("config" + File.separator + "extended-entities.dot");
+        File actionsFile = new File("config" + File.separator + "extended-actions.xml");
+        EntityFileParser stateParser = new EntityFileParser(entitiesFile);
+        GameState gameState = stateParser.getGameState();
+        ActionFileParser.parseActionFile(actionsFile, gameState);
+        GameAction unlock = gameState.getGameActions().get("unlock").get(0);
+        CommandParser.parseCommand("simon: goto forest", gameState);
+        CommandParser.parseCommand("simon: get key", gameState);
+        CommandParser.parseCommand("simon: goto cabin", gameState);
+        String response = CommandParser.parseCommand("simon: unlock and open trapdoor", gameState);
+        assertEquals(CustomCommand.execute(gameState, unlock, "simon(player)"), response);
+    }
+
+    @Test
+    void testHitAndPayElfTriggers() {
+        File entitiesFile = new File("config" + File.separator + "extended-entities.dot");
+        File actionsFile = new File("config" + File.separator + "extended-actions.xml");
+        EntityFileParser stateParser = new EntityFileParser(entitiesFile);
+        GameState gameState = stateParser.getGameState();
+        ActionFileParser.parseActionFile(actionsFile, gameState);
+        assertTrue(gameState.getEntityMap("location").containsKey("storeroom"));
+        CommandParser.parseCommand("coin: get axe", gameState);
+        String response = CommandParser.parseCommand("coin: look", gameState);
+        assertTrue(response.contains("coin"));
+        response = CommandParser.parseCommand("simon: look", gameState);
+        assertFalse(response.contains("axe"));
+        CommandParser.parseCommand("simon: get coin", gameState);
+        response = CommandParser.parseCommand("coin: look", gameState);
+        assertFalse(response.contains("coin"));
+        CommandParser.parseCommand("simon: drop coin", gameState);
+        response = CommandParser.parseCommand("coin: look", gameState);
+        assertTrue(response.contains("coin"));
+        CommandParser.parseCommand("simon: goto forest", gameState);
+        CommandParser.parseCommand("simon: get key", gameState);
+        CommandParser.parseCommand("simon: goto cabin", gameState);
+        CommandParser.parseCommand("simon: unlock trapdoor", gameState);
+        CommandParser.parseCommand("simon: goto cellar", gameState);
+        CommandParser.parseCommand("simon: hit and pay elf", gameState);
+        assertEquals(2, gameState.getPlayer("simon").getHealth());
+        CommandParser.parseCommand("simon: goto cabin", gameState);
+        CommandParser.parseCommand("simon: get coin", gameState);
+        CommandParser.parseCommand("simon: goto cellar", gameState);
+        CommandParser.parseCommand("simon: hit and pay elf", gameState);
+        assertEquals(2, gameState.getPlayer("simon").getHealth());
+        assertTrue(gameState.getPlayer("simon").getInventory().containsKey("coin"));
+    }
+
+    @Test
+    void listAllSubjects() {
+        File entitiesFile = new File("config" + File.separator + "extended-entities.dot");
+        File actionsFile = new File("config" + File.separator + "extended-actions.xml");
+        EntityFileParser stateParser = new EntityFileParser(entitiesFile);
+        GameState gameState = stateParser.getGameState();
+        ActionFileParser.parseActionFile(actionsFile, gameState);
+        CommandParser.parseCommand("simon: get axe", gameState);
+        CommandParser.parseCommand("simon: goto forest", gameState);
+        CommandParser.parseCommand("simon: tree cut down and cut and chop down axe", gameState);
+        CommandParser.parseCommand("simon: get key", gameState);
+        CommandParser.parseCommand("simon: get log", gameState);
+        String response = CommandParser.parseCommand("simon: inv", gameState);
+        assertTrue(response.contains("log"));
+        CommandParser.parseCommand("simon: goto cabin", gameState);
+        CommandParser.parseCommand("simon: unlock and open trapdoor with key", gameState);
+        CommandParser.parseCommand("simon: goto cellar", gameState);
+        CommandParser.parseCommand("simon: hit and pay elf", gameState);
 
     }
+
+    @Test
+    void producedEntityInOtherPlayerInv() {
+        File entitiesFile = new File("config" + File.separator + "extended-entities.dot");
+        File actionsFile = new File("config" + File.separator + "extended-actions-produced-artefact.xml");
+        EntityFileParser stateParser = new EntityFileParser(entitiesFile);
+        GameState gameState = stateParser.getGameState();
+        ActionFileParser.parseActionFile(actionsFile, gameState);
+        CommandParser.parseCommand("simon: goto forest", gameState);
+        CommandParser.parseCommand("simon: goto riverbank", gameState);
+        CommandParser.parseCommand("simon: blow horn", gameState);
+        String response = CommandParser.parseCommand("simon: look", gameState);
+        assertTrue(response.contains("potion"));
+        CommandParser.parseCommand("sion: goto forest", gameState);
+        CommandParser.parseCommand("sion: goto riverbank", gameState);
+        CommandParser.parseCommand("sion: get potion", gameState);
+        CommandParser.parseCommand("sion: goto forest", gameState);
+        CommandParser.parseCommand("sion: goto cabin", gameState);
+        CommandParser.parseCommand("simon: blow horn", gameState);
+        response = CommandParser.parseCommand("simon: look", gameState);
+        assertFalse(response.contains("potion"));
+        CommandParser.parseCommand("sion: drop potion", gameState);
+        CommandParser.parseCommand("simon: blow horn", gameState);
+        response = CommandParser.parseCommand("simon: look", gameState);
+        assertTrue(response.contains("potion"));
+    }
+
 
 }

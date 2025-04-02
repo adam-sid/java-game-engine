@@ -1,5 +1,9 @@
 package edu.uob;
 
+import edu.uob.GameParsing.ActionFileParser;
+import edu.uob.GameParsing.CommandParser;
+import edu.uob.GameParsing.EntityFileParser;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;

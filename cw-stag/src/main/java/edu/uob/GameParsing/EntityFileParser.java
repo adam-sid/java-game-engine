@@ -1,4 +1,4 @@
-package edu.uob;
+package edu.uob.GameParsing;
 
 import java.io.FileReader;
 import java.io.File;
@@ -12,6 +12,7 @@ import com.alexmerz.graphviz.objects.Node;
 import com.alexmerz.graphviz.objects.Edge;
 import edu.uob.GameEntity.GameEntity;
 import edu.uob.GameEntity.LocationEntity;
+import edu.uob.GameState;
 
 public class EntityFileParser {
 

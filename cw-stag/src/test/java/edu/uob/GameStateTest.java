@@ -2,6 +2,7 @@ package edu.uob;
 
 import edu.uob.GameEntity.GameEntity;
 import edu.uob.GameEntity.LocationEntity;
+import edu.uob.GameParsing.EntityFileParser;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;

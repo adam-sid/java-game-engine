@@ -1,10 +1,13 @@
-package edu.uob;
+package edu.uob.GameParsing;
 
-import edu.uob.Commands.*;
+import edu.uob.GameCommands.*;
 import edu.uob.GameAction.GameAction;
 import edu.uob.GameEntity.GameEntity;
 import edu.uob.GameEntity.LocationEntity;
 import edu.uob.GameEntity.PlayerEntity;
+import edu.uob.GameState;
+import edu.uob.ResponseList;
+import edu.uob.Utils;
 
 import java.util.*;
 
@@ -18,6 +21,8 @@ public class CommandParser {
             ' ', '\'', '-'
     );
 
+    //takes initial user command and calls helper functions to tokenise before checking
+    //username is correct and adding any player tags to players mentioned in the command
     public static String parseCommand(String command, GameState gameState) {
         LinkedList<String> tokenList = CommandParser.tokeniseCommandString(command);
         if (tokenList.isEmpty()) {
@@ -42,17 +47,21 @@ public class CommandParser {
         return CommandParser.parseAction(tokenList, gameState);
     }
 
+    //checks for illegal characters in a username, returns TRUE if any seen
     private static boolean invalidUserName(String userName) {
+        boolean sawBadChar = false;
         for (char stringChar : userName.toCharArray()) {
             if (!(Character.isLetter(stringChar) || VALID_CHARS.contains(stringChar))) {
-                return true;
+                sawBadChar = true;
             }
         }
-        return false;
+        return sawBadChar;
     }
 
+    //determines whether a basic or custom action is called and calls appropriate helper methods to
+    //parse/validate the command
     private static String parseAction(LinkedList<String> tokenList, GameState gameState) {
-        //first check if there is 1 basic action - if 2+ then reject immediately
+        //first check the number of basic actions in the string
         int basicActionCount = (int) tokenList.stream().filter(BASIC_ACTIONS :: contains).count();
         if (basicActionCount == 1) {
             String action = tokenList.stream()
@@ -76,7 +85,11 @@ public class CommandParser {
         return ResponseList.noActionFound();
     }
 
-    private static Map<String, List<GameAction>> parseCustomAction(LinkedList<String> tokenList, GameState gameState) {
+    //method returns a map of triggers matched to lists of game actions
+    //every possible game action is passed to the canActionExecute command and if a TRUE is returned
+    //then it is added to this map
+    private static Map<String, List<GameAction>> parseCustomAction(LinkedList<String> tokenList,
+                                                                   GameState gameState) {
         Map<String, List<GameAction>> customActionMap = gameState.getGameActions();
         Map <String, List<GameAction>> executableActionMap = new HashMap<>();
         for (Map.Entry<String, List<GameAction>> actionEntry : customActionMap.entrySet()) {
@@ -113,7 +126,9 @@ public class CommandParser {
         return validActionList;
     }
 
-    private static boolean commandContainsTrigger(LinkedList<String> tokenList, LinkedList<String> triggerTokens) {
+
+    private static boolean commandContainsTrigger(LinkedList<String> tokenList,
+                                                  LinkedList<String> triggerTokens) {
         if (triggerTokens.size() > tokenList.size() - 1) {
             return false;
         }
@@ -131,7 +146,8 @@ public class CommandParser {
         return false;
     }
 
-    //TODO this doesnt work on multiple triggers - use debug to work out why
+    //method will determine whether a command is executable based on
+    //availability of subjects and form of command
     private static Boolean canActionExecute(GameState gameState, LinkedList<String> tokenList,
                                             GameAction triggeredAction) {
         LinkedList<String> bufferList = new LinkedList<>(tokenList.subList(1, tokenList.size()));
@@ -146,12 +162,29 @@ public class CommandParser {
         boolean subjectsAvailable = availableSubjects.keySet().containsAll(actionSubjects.keySet());
         //check at least one of the subjects needed for action is in command
         boolean subjectInString = actionSubjects.keySet().stream().anyMatch(tokenList::contains);
+        boolean otherPlayerHasEntities = CommandParser.otherPlayerHasEntities(gameState, tokenList, triggeredAction);
         //check if there are not any 'extraneous' subjects
         Map<String, GameEntity> extraneousSubjects = new HashMap<>(gameState.getEntityMap("all"));
         extraneousSubjects.putAll(subjectsInInventory);
         extraneousSubjects.keySet().removeAll(actionSubjects.keySet());
         boolean extraneousSubjectExists = extraneousSubjects.keySet().stream().anyMatch(bufferList::contains);
-        return subjectsAvailable && subjectInString && !extraneousSubjectExists;
+        return subjectsAvailable && subjectInString && !extraneousSubjectExists && !otherPlayerHasEntities;
+    }
+
+    private static boolean otherPlayerHasEntities(GameState gameState, LinkedList<String> tokenList,
+                                                  GameAction triggeredAction) {
+        Map<String, GameEntity> combinedEntities = new HashMap<>(triggeredAction.getConsumedEntities());
+        combinedEntities.putAll(triggeredAction.getProducedEntities());
+        Set<String> consumedAndProducedSet = combinedEntities.keySet();
+        Set<String> inventory = new HashSet<>();
+        //add all player inventories to inventory hashset excluding current player
+        for (Map.Entry<String, GameEntity> entry : gameState.getEntityMap("player").entrySet()) {
+            if (!entry.getKey().equals(tokenList.get(0))) {
+                inventory.addAll(gameState.getPlayerInventory(entry.getKey()).keySet());
+            }
+        }
+        //check if there is any overlap between other players' inventory and consumed/produced entities
+        return !Collections.disjoint(inventory, consumedAndProducedSet);
     }
 
     private static String parseBasicAction(LinkedList<String> tokenList, GameState gameState, String basicAction) {
@@ -237,6 +270,9 @@ public class CommandParser {
         }
     }
 
+    //method takes a list with three entities and a 'keyword' string as argument
+    //it will return the part of the list that does not equal keyword or is first in list
+    //allows for command "forest goto" for e.g
     private static String getSubjectName(String keyword,LinkedList<String> tokenList) {
         String targetItem;
         if (tokenList.get(1).equals(keyword)) {
@@ -247,6 +283,7 @@ public class CommandParser {
         return targetItem;
     }
 
+    //checks whether get command is acting on an artefact and selects response depending on which type of entity
     private static String parseGetResponse(LinkedList<String> tokenList, GameState gameState,
                                            String itemType, String itemToGet) {
         switch (itemType) {
@@ -272,6 +309,7 @@ public class CommandParser {
         }
     }
 
+    //tokenises the command string and returns an empty list if username is badly formed
     private static LinkedList<String> tokeniseCommandString(String command) {
         LinkedList<String> tokenList = new LinkedList<>();
         if (!command.contains(":")) {
@@ -287,6 +325,7 @@ public class CommandParser {
         return tokenList;
     }
 
+    //tokenises any string passed to it
     private static void tokeniseString(String string, LinkedList<String> tokenList) {
         StringTokenizer tokenizer = new StringTokenizer(string, " ");
         while (tokenizer.hasMoreTokens()) {
@@ -295,11 +334,14 @@ public class CommandParser {
         }
     }
 
+    //A function that adds a '(player)' tag to player names found in the string
+    //will not add a tag if the player name is also a basic command, custom command or entity in the game
+    //to avoid confusion
     private static Set<Integer> whichTokenPlayer(GameState gameState, LinkedList<String> tokenList) {
         Set<Integer> playerIndices = new HashSet<>();
         Set<String> customActionTriggers = gameState.getGameActions().keySet();
         Map<String, GameEntity> players = gameState.getEntityMap("player");
-        Map<String, GameEntity> allEntitiesButPlayer = new HashMap<>(gameState.getEntityMap("all"));
+        Map<String, GameEntity> allEntitiesButPlayer = new HashMap<>(gameState.getEntityMap("gameStart"));
         allEntitiesButPlayer.keySet().removeAll(players.keySet());
         List<String> playerNames = players.keySet().stream().toList();
         LinkedList<String> bufferList = new LinkedList<>(tokenList);
@@ -310,6 +352,7 @@ public class CommandParser {
             boolean b = allEntitiesButPlayer.containsKey(tokenNoTag);
             boolean c = BASIC_ACTIONS.contains(tokenNoTag);
             boolean d = customActionTriggers.contains(tokenNoTag);
+            //if a command token is a player name, BUT player name is not also an action or entity then TRUE
             if(playerNames.contains(tokenTag) && !allEntitiesButPlayer.containsKey(tokenNoTag) &&
                 !BASIC_ACTIONS.contains(tokenNoTag) && !customActionTriggers.contains(tokenNoTag)) {
                 playerIndices.add(i);

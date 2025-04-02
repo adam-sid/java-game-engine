@@ -16,6 +16,7 @@ public class GameState {
     private final Map<String, GameEntity> characters;
     private final Map<String, GameEntity> players = new HashMap<>();
     private final Map<String, GameEntity> allEntities = new HashMap<>();
+    private final Map<String, GameEntity> allEntitiesGameStart = new HashMap<>();
     private final Map<String, List<GameAction>> gameActions = new HashMap<>();
 
     public GameState(Map<String, GameEntity> locations, String startLocationName, Map<String, GameEntity> furniture,
@@ -29,12 +30,14 @@ public class GameState {
         this.allEntities.putAll(furniture);
         this.allEntities.putAll(artefacts);
         this.allEntities.putAll(characters);
+        this.allEntitiesGameStart.putAll(allEntities);
     }
 
     public void addPlayer(String playerName) {
         PlayerEntity newPlayer = new PlayerEntity(playerName, startLocationName);
         this.players.put(playerName, newPlayer);
         this.allEntities.put(playerName, newPlayer);
+        this.allEntitiesGameStart.put(playerName, newPlayer);
     }
 
     public Map<String, GameEntity> getEntityMap(String entityType) {
@@ -45,6 +48,7 @@ public class GameState {
             case "location": return this.locations;
             case "player": return this.players;
             case "all": return this.allEntities;
+            case "gameStart": return this.allEntitiesGameStart;
             default: return null;
         }
     }
@@ -87,11 +91,17 @@ public class GameState {
     }
 
     public PlayerEntity getPlayer(String playerName) {
-        if (this.players.containsKey(playerName)) {
-            return (PlayerEntity) this.players.get(playerName);
+        String tagName = Utils.addPlayerTag(playerName);
+        if (this.players.containsKey(tagName)) {
+            return (PlayerEntity) this.players.get(tagName);
         } else {
-            throw new RuntimeException(playerName);
+            throw new RuntimeException(tagName);
         }
+    }
+
+    public Map<String, GameEntity> getPlayerInventory(String playerName) {
+        PlayerEntity player = (PlayerEntity) this.players.get(Utils.addPlayerTag(playerName));
+        return player.getInventory();
     }
 
     public Map<String, List<GameAction>> getGameActions() {
