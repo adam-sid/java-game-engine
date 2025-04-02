@@ -1,17 +1,15 @@
 package edu.uob;
 
-import edu.uob.GameCommands.CustomCommand;
-import edu.uob.GameCommands.LookCommand;
+import edu.uob.GameCommand.CustomCommand;
+import edu.uob.GameCommand.LookCommand;
 import edu.uob.GameAction.GameAction;
 import edu.uob.GameEntity.GameEntity;
-import edu.uob.GameEntity.LocationEntity;
 import edu.uob.GameParsing.ActionFileParser;
 import edu.uob.GameParsing.CommandParser;
 import edu.uob.GameParsing.EntityFileParser;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -560,7 +558,8 @@ public class CommandParsingTest {
         CommandParser.parseCommand("adam: open sesame trapdoor", gameState);
         response = CommandParser.parseCommand("adam: look", gameState);
         assertTrue(response.contains("cellar"));
-        CommandParser.parseCommand("adam: open sesame wizard", gameState);
+        //CommandParser.parseCommand("adam: open sesame wizard", gameState);
+        CommandParser.parseCommand("adam: Unlock cabin wizard", gameState);
         response = CommandParser.parseCommand("adam: look", gameState);
         assertTrue(response.contains("lumberjack"));
     }

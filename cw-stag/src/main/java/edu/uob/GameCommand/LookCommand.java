@@ -1,4 +1,4 @@
-package edu.uob.GameCommands;
+package edu.uob.GameCommand;
 
 import edu.uob.GameEntity.GameEntity;
 import edu.uob.GameEntity.LocationEntity;
@@ -20,8 +20,8 @@ public class LookCommand {
                 .getEntitiesFromLocation("all", locationName));
         visibleEntities.remove(locationName);
         visibleEntities.remove(playerName);
-        int lineWidth = findLongestString(visibleEntities.keySet()) ;
-        addVisibleEntities(visibleEntities, messageBuilder, lineWidth);
+        int lineWidth = LookCommand.findLongestString(visibleEntities.keySet()) ;
+        LookCommand.addVisibleEntities(visibleEntities, messageBuilder, lineWidth);
         LookCommand.addPaths(messageBuilder, gameState, playerLocation);
         return messageBuilder.toString();
     }

@@ -1,4 +1,4 @@
-package edu.uob.GameCommands;
+package edu.uob.GameCommand;
 
 import edu.uob.GameAction.GameAction;
 import edu.uob.GameEntity.GameEntity;

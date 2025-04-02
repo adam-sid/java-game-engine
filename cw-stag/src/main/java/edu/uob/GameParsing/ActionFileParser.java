@@ -43,7 +43,8 @@ public class ActionFileParser {
             List<String> produced = new LinkedList<>();
             List<String> consumed = new LinkedList<>();
             changeInHealth = 0;
-            String narration = extractActionProperties(actionChildren, triggers, subjects, produced, consumed);
+            String narration = ActionFileParser.extractActionProperties(actionChildren, triggers,
+                    subjects, produced, consumed);
             Map<String, GameEntity> subjectEntities = lookUpEntities(gameState, subjects);
             Map<String, GameEntity> producedEntities = lookUpEntities(gameState, produced);
             Map<String, GameEntity> consumedEntities = lookUpEntities(gameState, consumed);
@@ -112,7 +113,7 @@ public class ActionFileParser {
             if (triggerChildren.item(i).getNodeType() == Node.ELEMENT_NODE) {
                 Element node = (Element) triggerChildren.item(i);
                 String content = node.getTextContent().toLowerCase();
-                setHealth(content, addHealth);
+                ActionFileParser.setHealth(content, addHealth);
                 leafContents.add(content);
             }
         }

@@ -1,6 +1,6 @@
 package edu.uob.GameParsing;
 
-import edu.uob.GameCommands.*;
+import edu.uob.GameCommand.*;
 import edu.uob.GameAction.GameAction;
 import edu.uob.GameEntity.GameEntity;
 import edu.uob.GameEntity.LocationEntity;
