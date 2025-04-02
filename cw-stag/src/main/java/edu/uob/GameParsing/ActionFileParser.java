@@ -19,6 +19,8 @@ import org.w3c.dom.NodeList;
 
 public class ActionFileParser {
 
+    private static int changeInHealth = 0;
+
     //main method - calls all helpers and ensures file can be found in config
     public static void parseActionFile(File file, GameState gameState) {
         try {
@@ -40,12 +42,13 @@ public class ActionFileParser {
             List<String> subjects = new LinkedList<>();
             List<String> produced = new LinkedList<>();
             List<String> consumed = new LinkedList<>();
+            changeInHealth = 0;
             String narration = extractActionProperties(actionChildren, triggers, subjects, produced, consumed);
             Map<String, GameEntity> subjectEntities = lookUpEntities(gameState, subjects);
             Map<String, GameEntity> producedEntities = lookUpEntities(gameState, produced);
             Map<String, GameEntity> consumedEntities = lookUpEntities(gameState, consumed);
             GameAction gameAction = new GameAction(subjectEntities, consumedEntities, producedEntities, narration);
-            ActionFileParser.setChangeInHealth(gameAction, produced, consumed);
+            gameAction.setChangeInHealth(changeInHealth);
             for (String trigger: triggers) {
                 gameState.addGameAction(trigger, gameAction);
             }
@@ -60,19 +63,19 @@ public class ActionFileParser {
             String type = actionChild.getNodeName().toLowerCase();
             switch (type) {
                 case "triggers": {
-                    triggers.addAll(extractLeafContent(actionChild));
+                    triggers.addAll(extractLeafContent(actionChild, null));
                     break;
                 }
                 case "subjects": {
-                    subjects.addAll(extractLeafContent(actionChild));
+                    subjects.addAll(extractLeafContent(actionChild, null));
                     break;
                 }
                 case "produced": {
-                    produced.addAll(extractLeafContent(actionChild));
+                    produced.addAll(extractLeafContent(actionChild, true));
                     break;
                 }
                 case "consumed": {
-                    consumed.addAll(extractLeafContent(actionChild));
+                    consumed.addAll(extractLeafContent(actionChild, false));
                     break;
                 }
                 case "narration": {
@@ -84,12 +87,6 @@ public class ActionFileParser {
             }
         }
         return narration;
-    }
-
-    private static void setChangeInHealth(GameAction gameAction, List<String> produced, List<String> consumed) {
-        int plusHealth = (int) produced.stream().filter(Predicate.isEqual("health")).count();
-        int minusHealth = (int) consumed.stream().filter(Predicate.isEqual("health")).count();
-        gameAction.setChangeInHealth(plusHealth - minusHealth);
     }
 
     //checks whether entities exist in the game state, if not throws exception as action file is faulty
@@ -108,16 +105,29 @@ public class ActionFileParser {
     }
 
     //gets the trigger and entity names from the XML
-    private static Set<String> extractLeafContent(Node actionChild) {
+    private static Set<String> extractLeafContent(Node actionChild, Boolean addHealth) {
         NodeList triggerChildren = actionChild.getChildNodes();
         Set<String> leafContents = new HashSet<>();
         for (int i = 0; i < triggerChildren.getLength(); i++) {
             if (triggerChildren.item(i).getNodeType() == Node.ELEMENT_NODE) {
                 Element node = (Element) triggerChildren.item(i);
                 String content = node.getTextContent().toLowerCase();
+                setHealth(content, addHealth);
                 leafContents.add(content);
             }
         }
         return leafContents;
+    }
+
+    private static void setHealth(String content, Boolean addHealth) {
+        if (addHealth == null || !content.trim().equals("health")) {
+            return;
+        }
+        if (addHealth) {
+            changeInHealth++;
+        } else {
+            changeInHealth--;
+        }
+
     }
 }

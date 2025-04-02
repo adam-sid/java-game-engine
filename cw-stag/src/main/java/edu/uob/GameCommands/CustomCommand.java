@@ -14,10 +14,7 @@ public class CustomCommand {
         PlayerEntity player = gameState.getPlayer(playerName);
         String playerLocation = player.getLocationName();
         int changeInHealth = action.getChangeInHealth();
-        if (!player.modifyHealth(changeInHealth)) {
-            gameState.resetPlayer(player);
-            return ResponseList.playerDeath();
-        }
+        boolean playerLives = player.modifyHealth(changeInHealth);
         Map<String, GameEntity> producedEntities = action.getProducedEntities();
         for (String entityName : producedEntities.keySet()) {
             gameState.produceEntity(playerLocation, entityName, player);
@@ -25,6 +22,10 @@ public class CustomCommand {
         Map<String, GameEntity> consumedEntities = action.getConsumedEntities();
         for (String entityName : consumedEntities.keySet()) {
             gameState.consumeEntity(playerLocation, entityName, player);
+        }
+        if (!playerLives) {
+            gameState.resetPlayer(player);
+            return ResponseList.playerDeath();
         }
         return action.getNarration();
     }
