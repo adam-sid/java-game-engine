@@ -272,7 +272,7 @@ public class CommandParser {
 
     //method takes a list with three entities and a 'keyword' string as argument
     //it will return the part of the list that does not equal keyword or is first in list
-    //allows for command "forest goto" for e.g
+    //allows for command "forest goto" for e.g.
     private static String getSubjectName(String keyword,LinkedList<String> tokenList) {
         String targetItem;
         if (tokenList.get(1).equals(keyword)) {
@@ -348,10 +348,6 @@ public class CommandParser {
         for (int i = 0; i < bufferList.size(); i++) {
             String tokenNoTag = (bufferList.get(i));
             String tokenTag = Utils.addPlayerTag(bufferList.get(i));
-            boolean a = playerNames.contains(tokenTag);
-            boolean b = allEntitiesButPlayer.containsKey(tokenNoTag);
-            boolean c = BASIC_ACTIONS.contains(tokenNoTag);
-            boolean d = customActionTriggers.contains(tokenNoTag);
             //if a command token is a player name, BUT player name is not also an action or entity then TRUE
             if(playerNames.contains(tokenTag) && !allEntitiesButPlayer.containsKey(tokenNoTag) &&
                 !BASIC_ACTIONS.contains(tokenNoTag) && !customActionTriggers.contains(tokenNoTag)) {

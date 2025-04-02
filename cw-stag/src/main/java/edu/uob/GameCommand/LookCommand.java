@@ -22,7 +22,7 @@ public class LookCommand {
         visibleEntities.remove(playerName);
         int lineWidth = LookCommand.findLongestString(visibleEntities.keySet()) ;
         LookCommand.addVisibleEntities(visibleEntities, messageBuilder, lineWidth);
-        LookCommand.addPaths(messageBuilder, gameState, playerLocation);
+        LookCommand.addPaths(messageBuilder, playerLocation);
         return messageBuilder.toString();
     }
 
@@ -37,8 +37,7 @@ public class LookCommand {
         }
     }
 
-    private static void addPaths(StringBuilder messageBuilder, GameState gameState,
-                                 LocationEntity playerLocation) {
+    private static void addPaths(StringBuilder messageBuilder, LocationEntity playerLocation) {
         HashMap<String, LocationEntity> availablePaths = playerLocation.getPaths();
         messageBuilder.append("\n\nYou can also access the following locations:");
         for (String path : availablePaths.keySet()) {

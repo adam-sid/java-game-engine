@@ -3,7 +3,6 @@ package edu.uob.GameParsing;
 import java.io.IOException;
 import java.io.File;
 import java.util.*;
-import java.util.function.Predicate;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
