@@ -83,7 +83,7 @@ public class EntityFileParser {
             String featureName = feature.getId().getId().toLowerCase();
             List<Node> entityList = feature.getNodes(false);
             for (Node entity : entityList) {
-                parseEntityType(locationName, entity, featureName);
+                this.parseEntityType(locationName, entity, featureName);
             }
         }
     }
@@ -107,11 +107,11 @@ public class EntityFileParser {
         }
     }
 
-    //finds paths in the second subgraph of a dot file
-    public void parsePaths(List<Edge> paths){
-        for (Edge path : paths) {
-            Node fromLocation = path.getSource().getNode();
-            Node toLocation = path.getTarget().getNode();
+    //finds paths in the second digraph of a dot file
+    public void parsePaths(List<Edge> pathEdges){
+        for (Edge pathEdge : pathEdges) {
+            Node fromLocation = pathEdge.getSource().getNode();
+            Node toLocation = pathEdge.getTarget().getNode();
             String fromName = fromLocation.getId().getId().toLowerCase();
             String toName = toLocation.getId().getId().toLowerCase();
 

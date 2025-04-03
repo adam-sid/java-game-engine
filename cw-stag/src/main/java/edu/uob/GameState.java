@@ -20,8 +20,8 @@ public class GameState {
     private final Map<String, GameEntity> allEntitiesGameStart = new HashMap<>();
     private final Map<String, List<GameAction>> gameActions = new HashMap<>();
 
-    public GameState(Map<String, GameEntity> locations, String startLocationName, Map<String, GameEntity> furniture,
-                     Map<String, GameEntity> artefacts, Map<String, GameEntity> characters) {
+    public GameState(Map<String, GameEntity> locations, String startLocationName, Map<String,
+            GameEntity> furniture, Map<String, GameEntity> artefacts, Map<String, GameEntity> characters) {
         this.locations = locations;
         this.startLocationName = startLocationName;
         this.furniture = furniture;
@@ -78,7 +78,7 @@ public class GameState {
             return null;
         }
         if (this.furniture.containsKey(entityName)) return "furniture";
-        if (this.characters.containsKey(entityName))return "character";
+        if (this.characters.containsKey(entityName)) return "character";
         if (this.artefacts.containsKey(entityName)) return "artefact";
         if (this.locations.containsKey(entityName)) return "location";
         if (this.players.containsKey(entityName) || this.players.containsKey(playerName)) return "player";

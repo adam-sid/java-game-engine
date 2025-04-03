@@ -188,7 +188,7 @@ public class CommandParser {
         return !Collections.disjoint(inventory, consumedAndProducedSet);
     }
 
-    private static String parseBasicAction(LinkedList<String> tokenList, GameState gameState, String basicAction) {
+    private static String parseBasicAction(LinkedList<String> tokenList, GameState gameState, String basicAction){
         switch (basicAction) {
             case "inventory", "inv":
                 return CommandParser.parseInventory(tokenList, gameState);
@@ -365,7 +365,7 @@ public class CommandParser {
         LinkedList<String> tokenisedList = new LinkedList<>();
         for (String listString : customActionTriggers) {
             if (listString.contains(" ")) {
-                tokeniseString(listString, tokenisedList);
+                CommandParser.tokeniseString(listString, tokenisedList);
             } else {
                 tokenisedList.add(listString);
             }
