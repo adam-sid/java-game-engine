@@ -24,6 +24,7 @@ public class EntityFileParser {
     private final Map<String, GameEntity> characters;
     private final GameState gameState;
 
+    //class builds the game's state and instantiates a new game state for use in other functions
     public EntityFileParser(File file) {
         this.file = file;
         this.locations = new HashMap<>();
@@ -40,6 +41,7 @@ public class EntityFileParser {
         return this.gameState;
     }
 
+    //method tries to read entity file and throws runtime exception if it fails
     public void parseEntityFile() {
         try {
             FileReader reader = new FileReader(this.file);
@@ -54,6 +56,7 @@ public class EntityFileParser {
         }
     }
 
+    //locations are added to game state. First location found is set as the start location
     public void parseLocations(List<Graph> locations) {
         for (Graph location : locations) {
             Node locationDetails = location.getNodes(false).get(0);
@@ -66,36 +69,45 @@ public class EntityFileParser {
             List<Graph> features = location.getSubgraphs();
             this.parseEntities(features, locationName);
         }
+        //create a storeroom if none are found
         if (!this.locations.containsKey("storeroom")) {
             this.locations.put("storeroom",
-                    new LocationEntity("storeroom", "Storage for any entities not placed in the game"));
+                    new LocationEntity("storeroom",
+                            "Storage for any entities not placed in the game"));
         }
     }
 
+    //parses entities in a location
     private void parseEntities(List<Graph> features, String locationName) {
         for (Graph feature : features) {
             String featureName = feature.getId().getId().toLowerCase();
             List<Node> entityList = feature.getNodes(false);
             for (Node entity : entityList) {
-                String entityName = entity.getId().getId().toLowerCase();
-                String entityDescription = entity.getAttribute("description").toLowerCase();
-                switch (featureName) {
-                    case "furniture":
-                        this.furniture.put(entityName, new GameEntity(entityName, entityDescription, locationName));
-                        break;
-                    case "characters":
-                        this.characters.put(entityName, new GameEntity(entityName, entityDescription, locationName));
-                        break;
-                    case "artefacts":
-                        this.artefacts.put(entityName, new GameEntity(entityName, entityDescription, locationName));
-                        break;
-                    default:
-                        throw new RuntimeException();
-                }
+                parseEntityType(locationName, entity, featureName);
             }
         }
     }
 
+    //helper function for parseEntities that extracts the specific entity type
+    private void parseEntityType(String locationName, Node entity, String featureName) {
+        String entityName = entity.getId().getId().toLowerCase();
+        String entityDescription = entity.getAttribute("description").toLowerCase();
+        switch (featureName) {
+            case "furniture":
+                this.furniture.put(entityName, new GameEntity(entityName, entityDescription, locationName));
+                break;
+            case "characters":
+                this.characters.put(entityName, new GameEntity(entityName, entityDescription, locationName));
+                break;
+            case "artefacts":
+                this.artefacts.put(entityName, new GameEntity(entityName, entityDescription, locationName));
+                break;
+            default:
+                throw new RuntimeException();
+        }
+    }
+
+    //finds paths in the second subgraph of a dot file
     public void parsePaths(List<Edge> paths){
         for (Edge path : paths) {
             Node fromLocation = path.getSource().getNode();

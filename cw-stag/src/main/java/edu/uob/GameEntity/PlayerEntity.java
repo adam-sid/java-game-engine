@@ -10,24 +10,28 @@ public class PlayerEntity extends GameEntity{
     private int health;
     private final Map<String, GameEntity> inventory = new HashMap<>();
 
+    //class that extends GameEntity to include a modified description, setLocationName and adds
+    //health and inventory (unique to players)
     public PlayerEntity(String name, String locationName) {
         super(name, "", locationName);
         this.setPlayerDescription();
         this.health = 3;
     }
 
+    //adds a description to players that includes their name
     private void setPlayerDescription() {
         StringBuilder buildDescription = new StringBuilder();
         buildDescription.append("a player called ")
-                .append(Utils.removePlayerTag(this.name));
+                .append(Utils.removePlayerTag(this.entityName));
         this.description = buildDescription.toString();
     }
 
+    //overrides the super class to ensure that all inventory also change location
     @Override
     public void setLocationName(String newLocationName) {
         this.locationName = newLocationName;
-        for (GameEntity invEntity : this.inventory.values()) {
-            invEntity.setLocationName(newLocationName);
+        for (GameEntity entity : this.inventory.values()) {
+            entity.setLocationName(newLocationName);
         }
     }
 
@@ -50,11 +54,11 @@ public class PlayerEntity extends GameEntity{
         return inventory;
     }
 
-    public void addInventory(GameEntity invEntity) {
-        this.inventory.put(invEntity.getName(), invEntity);
+    public void addInventory(GameEntity entity) {
+        this.inventory.put(entity.getName(), entity);
     }
 
-    public void removeInventory(String invName) {
-        this.inventory.remove(invName);
+    public void removeInventory(String entityName) {
+        this.inventory.remove(entityName);
     }
 }

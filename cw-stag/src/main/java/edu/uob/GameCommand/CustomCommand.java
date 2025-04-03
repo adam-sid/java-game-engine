@@ -9,24 +9,26 @@ import edu.uob.ResponseList;
 import java.util.Map;
 
 public class CustomCommand {
-
-    public static String execute(GameState gameState, GameAction action, String playerName) {
+    //executes a custom command by first producing any entities in the player location,
+    // then consuming any entities. If the player dies this is performed last with the
+    // resetPlayer command
+    public static String executeCommand(GameState gameState, GameAction gameAction, String playerName) {
         PlayerEntity player = gameState.getPlayer(playerName);
         String playerLocation = player.getLocationName();
-        int changeInHealth = action.getChangeInHealth();
-        boolean playerLives = player.modifyHealth(changeInHealth);
-        Map<String, GameEntity> producedEntities = action.getProducedEntities();
+        int changeInHealth = gameAction.getChangeInHealth();
+        boolean playerIsAlive = player.modifyHealth(changeInHealth);
+        Map<String, GameEntity> producedEntities = gameAction.getProducedEntities();
         for (String entityName : producedEntities.keySet()) {
             gameState.produceEntity(playerLocation, entityName, player);
         }
-        Map<String, GameEntity> consumedEntities = action.getConsumedEntities();
+        Map<String, GameEntity> consumedEntities = gameAction.getConsumedEntities();
         for (String entityName : consumedEntities.keySet()) {
             gameState.consumeEntity(playerLocation, entityName, player);
         }
-        if (!playerLives) {
+        if (!playerIsAlive) {
             gameState.resetPlayer(player);
             return ResponseList.playerDeath();
         }
-        return action.getNarration();
+        return gameAction.getNarration();
     }
 }

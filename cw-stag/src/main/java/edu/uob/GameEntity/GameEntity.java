@@ -2,20 +2,21 @@ package edu.uob.GameEntity;
 
 public class GameEntity
 {
-    protected final String name;
+    protected final String entityName;
     protected String description;
     protected String locationName;
 
-    public GameEntity(String name, String description, String locationName)
+    //super class that holds all entities in game
+    public GameEntity(String entityName, String description, String locationName)
     {
-        this.name = name;
+        this.entityName = entityName;
         this.description = description;
         this.locationName = locationName;
     }
 
     public String getName()
     {
-        return this.name;
+        return this.entityName;
     }
 
     public String getDescription()

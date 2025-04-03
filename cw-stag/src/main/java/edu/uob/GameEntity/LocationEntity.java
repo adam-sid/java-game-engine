@@ -6,6 +6,7 @@ public class LocationEntity extends GameEntity {
 
     private final HashMap<String, LocationEntity> paths;
 
+    //class that extends GameEntity to include paths (unique to locations)
     //locationName for locations will just be their name!
     public LocationEntity(String name, String description) {
         super(name, description, name);

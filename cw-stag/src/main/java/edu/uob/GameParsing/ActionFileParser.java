@@ -21,10 +21,10 @@ public class ActionFileParser {
     private static int changeInHealth = 0;
 
     //main method - calls all helpers and ensures file can be found in config
-    public static void parseActionFile(File file, GameState gameState) {
+    public static void parseActionFile(File actionFile, GameState gameState) {
         try {
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-            Document document = builder.parse(file);
+            Document document = builder.parse(actionFile);
             Element root = document.getDocumentElement();
             NodeList actions = root.getChildNodes();
             ActionFileParser.extractActions(gameState, actions);

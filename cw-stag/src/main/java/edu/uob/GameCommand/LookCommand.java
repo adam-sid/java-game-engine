@@ -10,22 +10,25 @@ import java.util.Set;
 
 public class LookCommand {
 
-    public static String execute(GameState gameState, String playerName) {
-        StringBuilder messageBuilder = new StringBuilder();
+    //executes look and builds a string containing current location, entities in location and paths
+    public static String executeCommand(GameState gameState, String playerName) {
+        StringBuilder buildMessage = new StringBuilder();
         LocationEntity playerLocation = gameState.getPlayerLocation(playerName);
         String locationName = playerLocation.getName();
-        messageBuilder.append("You are in ").append(playerLocation.getDescription());
-        messageBuilder.append("\n\nYou can see:");
+        buildMessage.append("You are in ").append(playerLocation.getDescription());
+        buildMessage.append(" (").append(playerLocation.getName()).append(")");
+        buildMessage.append("\n\nYou can see:");
         Map<String, GameEntity> visibleEntities = new HashMap<>(gameState
                 .getEntitiesFromLocation("all", locationName));
         visibleEntities.remove(locationName);
         visibleEntities.remove(playerName);
         int lineWidth = LookCommand.findLongestString(visibleEntities.keySet()) ;
-        LookCommand.addVisibleEntities(visibleEntities, messageBuilder, lineWidth);
-        LookCommand.addPaths(messageBuilder, playerLocation);
-        return messageBuilder.toString();
+        LookCommand.addVisibleEntities(visibleEntities, buildMessage, lineWidth);
+        LookCommand.addPaths(buildMessage, playerLocation);
+        return buildMessage.toString();
     }
 
+    //adds to a string builder all entities visible to player
     private static void addVisibleEntities(Map<String, GameEntity> visibleEntities,
                                            StringBuilder messageBuilder, int lineWidth) {
         for (GameEntity visibleEntity : visibleEntities.values()) {
@@ -37,12 +40,13 @@ public class LookCommand {
         }
     }
 
+    //adds to a string builder all path names from a location
     private static void addPaths(StringBuilder messageBuilder, LocationEntity playerLocation) {
         HashMap<String, LocationEntity> availablePaths = playerLocation.getPaths();
         messageBuilder.append("\n\nYou can also access the following locations:");
-        for (String path : availablePaths.keySet()) {
+        for (String pathName : availablePaths.keySet()) {
             messageBuilder.append("\n");
-            messageBuilder.append(path);
+            messageBuilder.append(pathName);
         }
     }
 

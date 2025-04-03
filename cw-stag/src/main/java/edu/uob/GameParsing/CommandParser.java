@@ -77,7 +77,7 @@ public class CommandParser {
             boolean actionsAreSame = executableActionList.stream().distinct().count() == 1;
             if (actionsAreSame) {
                 GameAction triggeredAction = executableActionList.get(0);
-                return CustomCommand.execute(gameState, triggeredAction, tokenList.get(0));
+                return CustomCommand.executeCommand(gameState, triggeredAction, tokenList.get(0));
             } else if (!executableActionList.isEmpty()) {
                 return ResponseList.ambiguousCommand();
             }
@@ -114,7 +114,7 @@ public class CommandParser {
         }
         return executableActionMap;
     }
-
+    //helper function that calls canActionExecute on a list of game actions
     private static List<GameAction> parseActionList(GameState gameState, LinkedList<String> tokenList,
                                                     List<GameAction> possibleActions) {
         List<GameAction> validActionList = new LinkedList<>();
@@ -126,7 +126,7 @@ public class CommandParser {
         return validActionList;
     }
 
-
+    //parses a list of triggerTokens and returns true if a single/multi word trigger is found
     private static boolean commandContainsTrigger(LinkedList<String> tokenList,
                                                   LinkedList<String> triggerTokens) {
         if (triggerTokens.size() > tokenList.size() - 1) {
@@ -162,17 +162,18 @@ public class CommandParser {
         boolean subjectsAvailable = availableSubjects.keySet().containsAll(actionSubjects.keySet());
         //check at least one of the subjects needed for action is in command
         boolean subjectInString = actionSubjects.keySet().stream().anyMatch(tokenList::contains);
-        boolean otherPlayerHasEntities = CommandParser.otherPlayerHasEntities(gameState, tokenList, triggeredAction);
+        //check if other player has one of the consumed/produced entities
+        boolean playerHasEntity = CommandParser.playerHasEntity(gameState, tokenList, triggeredAction);
         //check if there are not any 'extraneous' subjects
         Map<String, GameEntity> extraneousSubjects = new HashMap<>(gameState.getEntityMap("all"));
         extraneousSubjects.putAll(subjectsInInventory);
         extraneousSubjects.keySet().removeAll(actionSubjects.keySet());
         boolean extraneousSubjectExists = extraneousSubjects.keySet().stream().anyMatch(bufferList::contains);
-        return subjectsAvailable && subjectInString && !extraneousSubjectExists && !otherPlayerHasEntities;
+        return subjectsAvailable && subjectInString && !extraneousSubjectExists && !playerHasEntity;
     }
 
-    private static boolean otherPlayerHasEntities(GameState gameState, LinkedList<String> tokenList,
-                                                  GameAction triggeredAction) {
+    private static boolean playerHasEntity(GameState gameState, LinkedList<String> tokenList,
+                                           GameAction triggeredAction) {
         Map<String, GameEntity> combinedEntities = new HashMap<>(triggeredAction.getConsumedEntities());
         combinedEntities.putAll(triggeredAction.getProducedEntities());
         Set<String> consumedAndProducedSet = combinedEntities.keySet();
@@ -208,7 +209,7 @@ public class CommandParser {
 
     private static String parseHealth(LinkedList<String> tokenList, GameState gameState) {
         if (tokenList.get(1).equals("health") && tokenList.size() == 2) {
-            return HealthCommand.execute(gameState, tokenList.get(0));
+            return HealthCommand.executeCommand(gameState, tokenList.get(0));
         } else {
             return ResponseList.badHealthCommand();
         }
@@ -216,7 +217,7 @@ public class CommandParser {
 
     private static String parseLook(LinkedList<String> tokenList, GameState gameState) {
         if (tokenList.get(1).equals("look") && tokenList.size() == 2) {
-            return LookCommand.execute(gameState, tokenList.get(0));
+            return LookCommand.executeCommand(gameState, tokenList.get(0));
         } else {
             return ResponseList.badLookCommand();
         }
@@ -232,7 +233,7 @@ public class CommandParser {
                 .get(playerLocationName);
         Map <String, LocationEntity> visiblePaths = playerLocation.getPaths();
         if (visiblePaths.containsKey(targetLocation)) {
-            return GoToCommand.execute(gameState, tokenList.get(0), targetLocation);
+            return GoToCommand.executeCommand(gameState, tokenList.get(0), targetLocation);
         } else {
             if (Objects.equals(playerLocationName, targetLocation)) {
                 return ResponseList.alreadyAtLocation();
@@ -249,7 +250,7 @@ public class CommandParser {
         PlayerEntity currentPlayer = (PlayerEntity) gameState.getEntityMap("player").get(tokenList.get(0));
         Map<String, GameEntity> playerInventory = currentPlayer.getInventory();
         if (playerInventory.containsKey(itemToDrop)) {
-            return DropCommand.execute(gameState, currentPlayer.getName(), itemToDrop);
+            return DropCommand.executeCommand(gameState, currentPlayer.getName(), itemToDrop);
         } else {
             return ResponseList.noItemInventory(itemToDrop);
         }
@@ -283,12 +284,12 @@ public class CommandParser {
         return targetItem;
     }
 
-    //checks whether get command is acting on an artefact and selects response depending on which type of entity
+    //check if get command is acting on an artefact and selects response depending on which type of entity
     private static String parseGetResponse(LinkedList<String> tokenList, GameState gameState,
                                            String itemType, String itemToGet) {
         switch (itemType) {
             case "artefact":
-                return GetCommand.execute(gameState, tokenList.get(0), itemToGet);
+                return GetCommand.executeCommand(gameState, tokenList.get(0), itemToGet);
             case "furniture":
                 return ResponseList.pickUpFurniture(itemToGet);
             case "player", "character":
@@ -302,8 +303,9 @@ public class CommandParser {
     }
 
     private static String parseInventory(LinkedList<String> tokenList, GameState gameState) {
-        if ((tokenList.get(1).equals("inventory") || tokenList.get(1).equals("inv")) && tokenList.size() == 2) {
-            return InventoryCommand.execute(gameState, tokenList.get(0));
+        if ((tokenList.get(1).equals("inventory") || tokenList.get(1).equals("inv")) &&
+                tokenList.size() == 2) {
+            return InventoryCommand.executeCommand(gameState, tokenList.get(0));
         } else {
             return ResponseList.badInvCommand();
         }
@@ -339,7 +341,8 @@ public class CommandParser {
     //to avoid confusion
     private static Set<Integer> whichTokenPlayer(GameState gameState, LinkedList<String> tokenList) {
         Set<Integer> playerIndices = new HashSet<>();
-        Set<String> customActionTriggers = gameState.getGameActions().keySet();
+        List<String> customActionTriggers = CommandParser.tokeniseList(gameState.getGameActions().keySet()
+                .stream().toList());
         Map<String, GameEntity> players = gameState.getEntityMap("player");
         Map<String, GameEntity> allEntitiesButPlayer = new HashMap<>(gameState.getEntityMap("gameStart"));
         allEntitiesButPlayer.keySet().removeAll(players.keySet());
@@ -355,5 +358,18 @@ public class CommandParser {
             }
         }
         return playerIndices;
+    }
+
+    //helper function to tokenise multi-word triggers into a list of strings
+    private static LinkedList<String> tokeniseList(List<String> customActionTriggers) {
+        LinkedList<String> tokenisedList = new LinkedList<>();
+        for (String listString : customActionTriggers) {
+            if (listString.contains(" ")) {
+                tokeniseString(listString, tokenisedList);
+            } else {
+                tokenisedList.add(listString);
+            }
+        }
+        return tokenisedList;
     }
 }

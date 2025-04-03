@@ -1,17 +1,19 @@
-C:\Users\adams\Java work\stag assignment\cw-stag\src\main\java\edu\uob\GameEntity\LocationEntity.java
-C:\Users\adams\Java work\stag assignment\cw-stag\src\main\java\edu\uob\GameAction\GameAction.java
-C:\Users\adams\Java work\stag assignment\cw-stag\src\main\java\edu\uob\GameServer.java
-C:\Users\adams\Java work\stag assignment\cw-stag\src\main\java\edu\uob\ActionFileParser.java
-C:\Users\adams\Java work\stag assignment\cw-stag\src\main\java\edu\uob\Commands\InventoryCommand.java
-C:\Users\adams\Java work\stag assignment\cw-stag\src\main\java\edu\uob\CommandParser.java
-C:\Users\adams\Java work\stag assignment\cw-stag\src\main\java\edu\uob\EntityFileParser.java
-C:\Users\adams\Java work\stag assignment\cw-stag\src\main\java\edu\uob\Commands\GetCommand.java
-C:\Users\adams\Java work\stag assignment\cw-stag\src\main\java\edu\uob\Commands\DropCommand.java
-C:\Users\adams\Java work\stag assignment\cw-stag\src\main\java\edu\uob\Commands\GoToCommand.java
-C:\Users\adams\Java work\stag assignment\cw-stag\src\main\java\edu\uob\GameEntity\GameEntity.java
-C:\Users\adams\Java work\stag assignment\cw-stag\src\main\java\edu\uob\Commands\LookCommand.java
-C:\Users\adams\Java work\stag assignment\cw-stag\src\main\java\edu\uob\ResponseList.java
-C:\Users\adams\Java work\stag assignment\cw-stag\src\main\java\edu\uob\GameClient.java
-C:\Users\adams\Java work\stag assignment\cw-stag\src\main\java\edu\uob\Commands\CustomCommand.java
-C:\Users\adams\Java work\stag assignment\cw-stag\src\main\java\edu\uob\GameEntity\PlayerEntity.java
-C:\Users\adams\Java work\stag assignment\cw-stag\src\main\java\edu\uob\GameState.java
+/home/fv24034/javapractice/JavaAssignment2/cw-stag/src/main/java/edu/uob/GameEntity/LocationEntity.java
+/home/fv24034/javapractice/JavaAssignment2/cw-stag/src/main/java/edu/uob/GameParsing/ActionFileParser.java
+/home/fv24034/javapractice/JavaAssignment2/cw-stag/src/main/java/edu/uob/ResponseList.java
+/home/fv24034/javapractice/JavaAssignment2/cw-stag/src/main/java/edu/uob/Utils.java
+/home/fv24034/javapractice/JavaAssignment2/cw-stag/src/main/java/edu/uob/GameCommand/HealthCommand.java
+/home/fv24034/javapractice/JavaAssignment2/cw-stag/src/main/java/edu/uob/GameEntity/PlayerEntity.java
+/home/fv24034/javapractice/JavaAssignment2/cw-stag/src/main/java/edu/uob/GameEntity/GameEntity.java
+/home/fv24034/javapractice/JavaAssignment2/cw-stag/src/main/java/edu/uob/GameCommand/InventoryCommand.java
+/home/fv24034/javapractice/JavaAssignment2/cw-stag/src/main/java/edu/uob/GameParsing/CommandParser.java
+/home/fv24034/javapractice/JavaAssignment2/cw-stag/src/main/java/edu/uob/GameCommand/GoToCommand.java
+/home/fv24034/javapractice/JavaAssignment2/cw-stag/src/main/java/edu/uob/GameCommand/CustomCommand.java
+/home/fv24034/javapractice/JavaAssignment2/cw-stag/src/main/java/edu/uob/GameState.java
+/home/fv24034/javapractice/JavaAssignment2/cw-stag/src/main/java/edu/uob/GameClient.java
+/home/fv24034/javapractice/JavaAssignment2/cw-stag/src/main/java/edu/uob/GameAction/GameAction.java
+/home/fv24034/javapractice/JavaAssignment2/cw-stag/src/main/java/edu/uob/GameCommand/GetCommand.java
+/home/fv24034/javapractice/JavaAssignment2/cw-stag/src/main/java/edu/uob/GameServer.java
+/home/fv24034/javapractice/JavaAssignment2/cw-stag/src/main/java/edu/uob/GameCommand/DropCommand.java
+/home/fv24034/javapractice/JavaAssignment2/cw-stag/src/main/java/edu/uob/GameParsing/EntityFileParser.java
+/home/fv24034/javapractice/JavaAssignment2/cw-stag/src/main/java/edu/uob/GameCommand/LookCommand.java

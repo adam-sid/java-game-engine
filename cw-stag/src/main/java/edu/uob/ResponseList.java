@@ -85,7 +85,8 @@ public class ResponseList {
     }
 
     public static String playerDeath() {
-        return "You died and all your items dropped on the ground, you have respawned at the start of the game";
+        return "You died and all your items dropped on the ground, " +
+                "you have respawned at the start of the game";
     }
 
     public static String alreadyAtLocation() {

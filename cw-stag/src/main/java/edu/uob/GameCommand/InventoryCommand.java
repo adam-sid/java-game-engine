@@ -8,16 +8,17 @@ import java.util.Map;
 
 public class InventoryCommand {
 
-    public static String execute(GameState gameState, String playerName) {
-        StringBuilder builder = new StringBuilder();
-        PlayerEntity player = (PlayerEntity) gameState.getEntityMap("player").get(playerName);
-        Map<String, GameEntity> invEntities = player.getInventory();
-        for (String invEntity : invEntities.keySet()) {
-            if (!builder.isEmpty()) {
-                builder.append("\n");
+    //returns the name value of all entities within a given players inventory
+    public static String executeCommand(GameState gameState, String playerName) {
+        StringBuilder buildMessage = new StringBuilder();
+        PlayerEntity player = gameState.getPlayer(playerName);
+        Map<String, GameEntity> playerInventory = player.getInventory();
+        for (String entity : playerInventory.keySet()) {
+            if (!buildMessage.isEmpty()) {
+                buildMessage.append("\n");
             }
-            builder.append(invEntity);
+            buildMessage.append(entity);
         }
-        return builder.toString();
+        return buildMessage.toString();
     }
 }

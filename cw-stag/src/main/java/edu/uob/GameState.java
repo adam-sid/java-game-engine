@@ -7,6 +7,7 @@ import edu.uob.GameEntity.PlayerEntity;
 
 import java.util.*;
 
+//class holds the entire game state in memory and allows for manipulation of game state
 public class GameState {
 
     private final Map<String, GameEntity> locations;
@@ -40,6 +41,9 @@ public class GameState {
         this.allEntitiesGameStart.put(playerName, newPlayer);
     }
 
+    //returns specific entities from the game based on type
+    //all returns all entities in the game
+    //gamestart returns entities as they were when the game initialised
     public Map<String, GameEntity> getEntityMap(String entityType) {
         switch (entityType) {
             case "furniture": return this.furniture;
@@ -53,6 +57,7 @@ public class GameState {
         }
     }
 
+    //returns entities of specified type from a given location
     public Map<String, GameEntity> getEntitiesFromLocation(String entityType, String locationName) {
         Map<String, GameEntity> entityMap = getEntityMap(entityType);
         Map<String, GameEntity> filteredEntities = new HashMap<>();
@@ -64,6 +69,7 @@ public class GameState {
         return filteredEntities;
     }
 
+    //returns the specified entity's type as a string
     public String getEntityTypeFromName(String entityName) {
         entityName = entityName.toLowerCase();
         String playerName = Utils.addPlayerTag(entityName);
@@ -81,6 +87,7 @@ public class GameState {
         }
     }
 
+    //returns the location of given player as an object
     public LocationEntity getPlayerLocation(String playerName) {
         if (this.players.containsKey(playerName)) {
             String locationName = this.players.get(playerName).getLocationName();
@@ -90,6 +97,7 @@ public class GameState {
         }
     }
 
+    //gets specified player object based on their name
     public PlayerEntity getPlayer(String playerName) {
         String tagName = Utils.addPlayerTag(playerName);
         if (this.players.containsKey(tagName)) {
@@ -99,6 +107,7 @@ public class GameState {
         }
     }
 
+    //gets a given players inventory map
     public Map<String, GameEntity> getPlayerInventory(String playerName) {
         PlayerEntity player = (PlayerEntity) this.players.get(Utils.addPlayerTag(playerName));
         return player.getInventory();
@@ -108,6 +117,9 @@ public class GameState {
         return gameActions;
     }
 
+    //if a given trigger is new then trigger and game action are added to the action map
+    //otherwise the gameAction is added to the list of game actions associated with the
+    // pre-existing trigger
     public void addGameAction(String triggerName, GameAction gameAction) {
         if(!this.gameActions.containsKey(triggerName)) {
             List<GameAction> newAction = new LinkedList<>();
@@ -118,6 +130,7 @@ public class GameState {
         }
     }
 
+    //consumes an entity - if entity is a path then it will break the path
     public void consumeEntity(String targetLocationName, String entityName, PlayerEntity player) {
         Map<String, GameEntity> playerInventory = player.getInventory();
         if (!(allEntities.containsKey(entityName) || playerInventory.containsKey(entityName))) {
@@ -134,6 +147,7 @@ public class GameState {
         }
     }
 
+    //produces an entity - if entity is a path then it will create a path
     public void produceEntity(String targetLocationName, String entityName, PlayerEntity player) {
         Map<String, GameEntity> playerInventory = player.getInventory();
         if (!(allEntities.containsKey(entityName) || playerInventory.containsKey(entityName))) {
@@ -174,6 +188,7 @@ public class GameState {
         this.allEntities.put(artefactName, artefactToMove);
     }
 
+    //resets the player in the event of their death
     public void resetPlayer(PlayerEntity player) {
         Map<String, GameEntity> playerInventory = player.getInventory();
         for (String entityName : playerInventory.keySet()) {

@@ -240,11 +240,11 @@ public class CommandParsingTest {
         CommandParser.parseCommand("get: get axe", gameState);
         CommandParser.parseCommand("get: goto forest", gameState);
         String response = CommandParser.parseCommand("get: look", gameState);
-        assertEquals(LookCommand.execute(gameState, "get(player)"), response);
+        assertEquals(LookCommand.executeCommand(gameState, "get(player)"), response);
         response = CommandParser.parseCommand("look: look", gameState);
-        assertEquals(LookCommand.execute(gameState, "look(player)"), response);
+        assertEquals(LookCommand.executeCommand(gameState, "look(player)"), response);
         response = CommandParser.parseCommand("horn: look", gameState);
-        assertEquals(LookCommand.execute(gameState, "horn(player)"), response);
+        assertEquals(LookCommand.executeCommand(gameState, "horn(player)"), response);
         CommandParser.parseCommand("get: goto forest", gameState);
         CommandParser.parseCommand("get: goto riverbank", gameState);
         CommandParser.parseCommand("get: blow horn", gameState);
@@ -267,7 +267,7 @@ public class CommandParsingTest {
         CommandParser.parseCommand("simon: get axe", gameState);
         CommandParser.parseCommand("simon: goto forest", gameState);
         String response = CommandParser.parseCommand("simon: tree cut down and cut and chop down axe", gameState);
-        assertEquals(CustomCommand.execute(gameState, cut, "simon(player)"), response);
+        assertEquals(CustomCommand.executeCommand(gameState, cut, "simon(player)"), response);
     }
 
     @Test
@@ -282,7 +282,7 @@ public class CommandParsingTest {
         CommandParser.parseCommand("simon: get key", gameState);
         CommandParser.parseCommand("simon: goto cabin", gameState);
         String response = CommandParser.parseCommand("simon: unlock and open trapdoor", gameState);
-        assertEquals(CustomCommand.execute(gameState, unlock, "simon(player)"), response);
+        assertEquals(CustomCommand.executeCommand(gameState, unlock, "simon(player)"), response);
     }
 
     @Test
@@ -562,5 +562,18 @@ public class CommandParsingTest {
         CommandParser.parseCommand("adam: Unlock cabin wizard", gameState);
         response = CommandParser.parseCommand("adam: look", gameState);
         assertTrue(response.contains("lumberjack"));
+    }
+
+    @Test
+    void testNameIsTrigger() {
+        File entitiesFile = new File("config" + File.separator + "extended-entities.dot");
+        File actionsFile = new File("config" + File.separator + "extended-actions-action-has-name.xml");
+        EntityFileParser stateParser = new EntityFileParser(entitiesFile);
+        GameState gameState = stateParser.getGameState();
+        ActionFileParser.parseActionFile(actionsFile, gameState);
+        CommandParser.parseCommand("simon: goto forest", gameState);
+        CommandParser.parseCommand("simon: get key", gameState);
+        CommandParser.parseCommand("simon: goto cabin", gameState);
+        CommandParser.parseCommand("simon: say open simon key trapdoor ", gameState);
     }
 }

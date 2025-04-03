@@ -12,6 +12,7 @@ public class GameAction
     private final String narration;
     private int changeInHealth = 0;
 
+    //class that holds subjects, consumed entities and produced entities
     public GameAction(Map<String, GameEntity> subjectEntities, Map<String, GameEntity> consumedEntities,
                       Map<String, GameEntity> producedEntities, String narration) {
         this.subjectEntities = subjectEntities;
