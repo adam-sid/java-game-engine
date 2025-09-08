@@ -65,12 +65,12 @@ public final class GameServer {
         try (ServerSocket s = new ServerSocket(portNumber)) {
             StringBuilder buildResponse = new StringBuilder("Server listening on port ")
                     .append(portNumber);
-            System.out.println(buildResponse);
+            //system.out.println(buildResponse);
             while (!Thread.interrupted()) {
                 try {
                     this.blockingHandleConnection(s);
                 } catch (IOException e) {
-                    System.out.println("Connection closed");
+                    //system.out.println("Connection closed");
                 }
             }
         }
@@ -87,12 +87,12 @@ public final class GameServer {
         try (Socket s = serverSocket.accept();
         BufferedReader reader = new BufferedReader(new InputStreamReader(s.getInputStream()));
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(s.getOutputStream()))) {
-            System.out.println("Connection established");
+            //system.out.println("Connection established");
             String incomingCommand = reader.readLine();
             if(incomingCommand != null) {
                 StringBuilder buildResponse = new StringBuilder("Received message from ")
                         .append(incomingCommand);
-                System.out.println(buildResponse);
+                //system.out.println(buildResponse);
                 String result = this.handleCommand(incomingCommand);
                 writer.write(result);
                 StringBuilder buildEOT = new StringBuilder("\n")
