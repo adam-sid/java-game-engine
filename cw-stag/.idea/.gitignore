@@ -8,6 +8,6 @@
 /dataSources.local.xml
 /target/
 .idea/
-.DS_Store
+/.DS_Store
 *.log
 *.iml
