@@ -31,5 +31,10 @@
       <option name="name" value="maven-repository" />
       <option name="url" value="file:////home/fv24034/javapractice/JavaAssignment2/resources/cw-stag/libs" />
     </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven-repository" />
+      <option name="name" value="maven-repository" />
+      <option name="url" value="file:////Users/adam-sid/Documents/projects/STAG/cw-stag/libs" />
+    </remote-repository>
   </component>
 </project>
