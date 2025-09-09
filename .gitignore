@@ -1,0 +1,8 @@
+.DS_Store
+cw-stag/dataSources/
+cw-stag/dataSources.local.xml
+cw-stag/target/
+cw-stag.idea/
+cw-stag/.DS_Store
+cw-stag/*.log
+cw-stag/*.iml
