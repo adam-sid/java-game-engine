@@ -4,7 +4,7 @@ This is a game engine written in Java that processes DOT and XML files. DOT file
 
 ## Set-up
 
-1. Ensure you have maven and java (minimum version 17) installed
+1. Ensure you have maven and Java (JDK version 17 min) installed
 2. Clone repo and from the main directory (cw-stag) run the following:
 ```bash
 mvn clean package
